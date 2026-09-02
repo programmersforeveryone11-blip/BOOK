@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOOK — Luizabeth's Studios</title>
-  
-  <!-- Tailwind CSS -->
+  <link rel="icon" type="image/png" href="f i l m s 1.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Syne, Space Grotesk, Archivo Black & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +15,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     tailwind.config = {
@@ -39,7 +40,6 @@
   </script>
 
   <style>
-    /* Estilo de la cuadrícula técnica */
     .bg-grid-pattern {
       background-color: #f7f7f8;
       background-image: 
@@ -50,7 +50,6 @@
       background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
     }
 
-    /* Ocultar barra de desplazamiento */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -64,54 +63,16 @@
       background-color: #0d0d0d;
     }
 
-    .corner-bracket {
-      position: relative;
-    }
-    .corner-bracket::before {
-      content: "┌";
-      position: absolute;
-      top: -6px;
-      left: -6px;
-      font-size: 14px;
-      line-height: 1;
-      color: #000;
-    }
-    .corner-bracket::after {
-      content: "┐";
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      font-size: 14px;
-      line-height: 1;
-      color: #000;
-    }
-    .corner-bracket-bottom::before {
-      content: "└";
-      position: absolute;
-      bottom: -6px;
-      left: -6px;
-      font-size: 14px;
-      line-height: 1;
-      color: #000;
-    }
-    .corner-bracket-bottom::after {
-      content: "┘";
-      position: absolute;
-      bottom: -6px;
-      right: -6px;
-      font-size: 14px;
-      line-height: 1;
-      color: #000;
-    }
-
     .side-menu-drawer {
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .slide-img {
-      transition: opacity 0.5s ease-in-out, transform 0.5s ease-out;
-      user-select: none;
-      -webkit-user-drag: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
     }
   </style>
 </head>
@@ -122,7 +83,6 @@
   =========================================== -->
   <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-black/10 px-4 md:px-8 py-3 flex items-center justify-between">
     
-    <!-- Menú Hamburguesa (Izquierda) -->
     <div class="flex items-center gap-4">
       <button id="menuBtn" onclick="toggleMenu()" class="group flex flex-col justify-center items-center w-8 h-8 focus:outline-none z-50 relative" aria-label="Abrir Menú">
         <span id="line1" class="w-6 h-[2px] bg-black transition-all duration-300 transform origin-center translate-y-[-3px]"></span>
@@ -131,27 +91,24 @@
       <span class="text-xs font-mono tracking-widest uppercase hidden sm:inline-block">MENU</span>
     </div>
 
-    <!-- LOGO CENTRAL -->
     <div class="text-center">
-      <a href="#" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
+      <a href="web.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
         BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
       </a>
     </div>
 
-    <!-- BUSCADOR, BOTÓN MI CUENTA / REGISTRO Y CARRITO (Derecha) -->
     <div class="flex items-center gap-3 md:gap-5">
       <div class="relative hidden sm:flex items-center">
         <input type="text" placeholder="Buscar libros, diarios..." class="w-36 lg:w-48 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
         <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 text-black"></i>
       </div>
 
-      <!-- Botón dinámico de Inicio de Sesión / Perfil -->
-      <button id="navUserBtn" onclick="openAuthModal()" class="flex items-center gap-2 bg-black text-white px-3 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all">
+      <button id="navUserBtn" onclick="openAuthModal()" class="flex items-center gap-2 bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all">
         <i data-lucide="user" class="w-3.5 h-3.5"></i>
         <span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>
       </button>
 
-      <a href="tienda.html" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
+      <a href="javascript:void(0)" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
         <i data-lucide="shopping-bag" class="w-5 h-5"></i>
         <span class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
       </a>
@@ -187,7 +144,7 @@
           </svg>
         </a>
 
-        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Tienda</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -195,7 +152,7 @@
           </svg>
         </a>
 
-        <a href="app.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>App</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -203,7 +160,7 @@
           </svg>
         </a>
 
-        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Membresia</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -211,7 +168,7 @@
           </svg>
         </a>
 
-        <a href="santuario.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Grafiti</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -219,7 +176,7 @@
           </svg>
         </a>
 
-        <a href="comunidad.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Comunidad-biblioteca</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -249,7 +206,6 @@
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-7xl mx-auto w-full my-auto">
       
-      <!-- IZQUIERDA -->
       <div class="lg:col-span-6 z-10">
         <div class="mb-4 inline-block px-2.5 py-1 bg-black text-white text-[10px] font-mono tracking-widest uppercase">
           Edición Especial 2026
@@ -280,7 +236,6 @@
         </div>
       </div>
 
-      <!-- DERECHA: LIBRO INTERACTIVO 3D -->
       <div class="lg:col-span-6 relative flex flex-col items-center justify-center">
         <div class="w-full h-[360px] md:h-[450px] relative rounded-lg border border-black/20 bg-white/50 backdrop-blur-sm shadow-xl overflow-hidden cursor-grab active:cursor-grabbing">
           <canvas id="threeCanvas" class="w-full h-full"></canvas>
@@ -300,25 +255,92 @@
     </div>
   </section>
 
-  <!-- =========================================================================
-       MODAL INTERACTIVO DE AUTENTICACIÓN / REGISTRO / INICIO DE SESIÓN
-  ========================================================================= -->
+  <!-- ==========================================
+       SECCIÓN DE LIBRERÍA & NOVEDADES
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-white border-b border-black">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 pb-4 border-b border-black/10">
+        <div>
+          <span class="text-xs font-mono text-neutral-400 uppercase tracking-widest block mb-1">COLECCIÓN DE LIBROS DIGITALES</span>
+          <h2 class="font-archivo text-3xl md:text-5xl uppercase tracking-tight">Diarios Populares</h2>
+        </div>
+        <p class="text-xs font-mono text-neutral-600 max-w-xs mt-4 md:mt-0">
+          Diseñados para registrar tus pasiones, resúmenes, bocetos y memorias personalizadas.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-neutral-900 text-white p-6 rounded-xl flex flex-col justify-between hover:scale-[1.01] transition-transform">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <span class="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-1 rounded">CINE & SERIES</span>
+              <i data-lucide="film" class="w-5 h-5 text-neutral-400"></i>
+            </div>
+            <h3 class="font-archivo text-2xl uppercase mb-2">Movie Diary Vol. 1</h3>
+            <p class="text-xs font-mono text-neutral-400">Organiza películas vistas, críticas, directores favoritos y listados de reproducción.</p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-white/10 flex justify-between items-center">
+            <span class="font-mono text-sm font-bold">$14.99 USD</span>
+            <button onclick="openAuthModal()" class="px-4 py-1.5 bg-white text-black text-xs font-mono rounded-full hover:bg-neutral-200 transition-colors">
+              Obtener
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-blue-900 text-white p-6 rounded-xl flex flex-col justify-between hover:scale-[1.01] transition-transform">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <span class="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-1 rounded">GAMING</span>
+              <i data-lucide="gamepad-2" class="w-5 h-5 text-blue-300"></i>
+            </div>
+            <h3 class="font-archivo text-2xl uppercase mb-2">Game Backlog Log</h3>
+            <p class="text-xs font-mono text-blue-200">Seguimiento de videojuegos completados, logros, notas de estrategia y reseñas.</p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-white/10 flex justify-between items-center">
+            <span class="font-mono text-sm font-bold">$14.99 USD</span>
+            <button onclick="openAuthModal()" class="px-4 py-1.5 bg-white text-black text-xs font-mono rounded-full hover:bg-neutral-200 transition-colors">
+              Obtener
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-emerald-900 text-white p-6 rounded-xl flex flex-col justify-between hover:scale-[1.01] transition-transform">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <span class="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-1 rounded">DEPORTES</span>
+              <i data-lucide="activity" class="w-5 h-5 text-emerald-300"></i>
+            </div>
+            <h3 class="font-archivo text-2xl uppercase mb-2">Sport Tracker</h3>
+            <p class="text-xs font-mono text-emerald-200">Diario de entrenamiento, metas de rendimiento y estadísticas personales.</p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-white/10 flex justify-between items-center">
+            <span class="font-mono text-sm font-bold">$12.99 USD</span>
+            <button onclick="openAuthModal()" class="px-4 py-1.5 bg-white text-black text-xs font-mono rounded-full hover:bg-neutral-200 transition-colors">
+              Obtener
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       MODAL INTERACTIVO DE AUTENTICACIÓN
+  =========================================== -->
   <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white w-full max-w-md rounded-2xl border border-black shadow-2xl overflow-hidden relative font-sans animate-fade-in">
       
-      <!-- Botón de Cerrar Modal -->
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-black p-1 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <!-- Encabezado del Modal -->
       <div class="p-6 bg-neutral-900 text-white border-b border-neutral-800">
         <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 block mb-1">ACCESO USUARIO — BOOK</span>
         <h3 class="font-archivo text-2xl tracking-tight uppercase" id="authModalTitle">Mi Cuenta</h3>
         <p class="text-xs text-neutral-400 font-mono mt-1">Guarda tus diarios y publicaciones personalizadas.</p>
       </div>
 
-      <!-- Pestañas -->
       <div class="flex border-b border-black/10 font-mono text-xs bg-neutral-100">
         <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-3 font-bold border-b-2 border-black text-black bg-white transition-all">
           INICIAR SESIÓN
@@ -328,14 +350,12 @@
         </button>
       </div>
 
-      <!-- Mensaje de Notificación -->
       <div id="authAlert" class="hidden px-6 pt-4">
         <div id="authAlertText" class="p-3 text-xs font-mono rounded bg-red-100 border border-red-400 text-red-700"></div>
       </div>
 
       <div class="p-6">
         
-        <!-- FORMULARIO INICIO DE SESIÓN -->
         <form id="formLogin" onsubmit="event.preventDefault(); loginWithEmail();" class="space-y-4">
           <div>
             <label class="block font-mono text-[11px] uppercase tracking-wider text-neutral-600 mb-1">Correo Electrónico</label>
@@ -352,7 +372,6 @@
           </button>
         </form>
 
-        <!-- FORMULARIO REGISTRO -->
         <form id="formRegister" onsubmit="event.preventDefault(); registerUser();" class="space-y-3 hidden">
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -423,49 +442,19 @@
   </div>
 
   <!-- ==========================================
-       LÓGICA JAVASCRIPT CON PERSISTENCIA Y FIRESTORE
+       LÓGICA JAVASCRIPT CON SUPABASE INTEGRADO
   =========================================== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      setPersistence, 
-      browserLocalPersistence,
-      signInWithPopup, 
-      GoogleAuthProvider, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+  <script>
+    const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo';
 
-    // Credenciales de Firebase de tu proyecto
-    const firebaseConfig = {
-      apiKey: "AIzaSyD6SBavtGM63_OJI2tDnPB8nlhQV7Va55c",
-      authDomain: "book-8cd5c.firebaseapp.com",
-      projectId: "book-8cd5c",
-      storageBucket: "book-8cd5c.firebasestorage.app",
-      messagingSenderId: "136955954326",
-      appId: "1:136955954326:web:b4944427d1f2be883baeb7",
-      measurementId: "G-SZB7BDEVVL"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app, "(default)");
-    const storage = getStorage(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    // Configurar Persistencia Local para que no se cierre la sesión al actualizar (F5)
-    setPersistence(auth, browserLocalPersistence).catch((error) => {
-      console.error("Error activando persistencia de sesión:", error);
-    });
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const LOCAL_SESSION_KEY = 'book_user_session';
 
     function showAlert(msg, isError = true) {
       const alertBox = document.getElementById('authAlert');
       const alertText = document.getElementById('authAlertText');
+      if (!alertBox || !alertText) return;
       alertBox.classList.remove('hidden');
       alertText.innerText = msg;
       alertText.className = isError 
@@ -474,15 +463,78 @@
     }
 
     function clearAlert() {
-      document.getElementById('authAlert').classList.add('hidden');
+      const alertBox = document.getElementById('authAlert');
+      if (alertBox) alertBox.classList.add('hidden');
     }
 
-    window.openAuthModal = () => { clearAlert(); document.getElementById('authModal').classList.remove('hidden'); };
-    window.closeAuthModal = () => { document.getElementById('authModal').classList.add('hidden'); };
+    function saveUserSession(userData) {
+      try {
+        localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(userData));
+        updateUIWithUser(userData);
+      } catch (e) {
+        console.error("Error guardando sesión:", e);
+      }
+    }
 
-    window.switchAuthTab = (tab) => {
+    function getStoredUserSession() {
+      try {
+        const stored = localStorage.getItem(LOCAL_SESSION_KEY);
+        return stored ? JSON.parse(stored) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearUserSession() {
+      localStorage.removeItem(LOCAL_SESSION_KEY);
+      updateUIWithUser(null);
+    }
+
+    function updateUIWithUser(userData) {
+      const navUserLabel = document.getElementById('navUserLabel');
+      const navUserBtn = document.getElementById('navUserBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const heroSignInBtn = document.getElementById('heroSignInBtn');
+
+      if (userData && (userData.nombre || userData.email)) {
+        const userName = (userData.nombre || userData.email.split('@')[0]).toUpperCase();
+        const userPhoto = userData.foto_perfil || null;
+
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+
+        if (navUserBtn) {
+          navUserBtn.onclick = function() { window.location.href = "perfil.html"; };
+          if (userPhoto) {
+            navUserBtn.innerHTML = '<img src="' + userPhoto + '" class="w-5 h-5 rounded-full object-cover border border-white"><span class="uppercase tracking-wider font-mono text-xs">' + userName + '</span>';
+          } else {
+            navUserBtn.innerHTML = '<i data-lucide="user-check" class="w-3.5 h-3.5"></i><span class="uppercase tracking-wider font-mono text-xs">' + userName + '</span>';
+          }
+        }
+
+        if (heroSignInBtn) {
+          heroSignInBtn.innerHTML = '<span>HOLA, ' + userName + ' (IR A PERFIL)</span><i data-lucide="arrow-right" class="w-4 h-4"></i>';
+          heroSignInBtn.onclick = function() { window.location.href = "perfil.html"; };
+        }
+      } else {
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (navUserBtn) {
+          navUserBtn.innerHTML = '<i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>';
+          navUserBtn.onclick = function() { openAuthModal(); };
+        }
+        if (heroSignInBtn) {
+          heroSignInBtn.innerHTML = '<span>Sign in / Registrarse</span><i data-lucide="arrow-right" class="w-4 h-4"></i>';
+          heroSignInBtn.onclick = function() { openAuthModal(); };
+        }
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    window.openAuthModal = function() { clearAlert(); document.getElementById('authModal').classList.remove('hidden'); };
+    window.closeAuthModal = function() { document.getElementById('authModal').classList.add('hidden'); };
+
+    window.switchAuthTab = function(tab) {
       clearAlert();
-      const isLogin = tab === 'login';
+      var isLogin = (tab === 'login');
       document.getElementById('formLogin').classList.toggle('hidden', !isLogin);
       document.getElementById('formRegister').classList.toggle('hidden', isLogin);
       document.getElementById('tabLoginBtn').className = isLogin 
@@ -493,17 +545,17 @@
         : 'flex-1 py-3 font-bold text-neutral-500 border-b-2 border-transparent hover:text-black transition-all';
     };
 
-    /* REGISTRO COMPLETO Y GUARDADO EN FIRESTORE */
-    window.registerUser = async () => {
+    window.registerUser = async function() {
       clearAlert();
-      const name = document.getElementById('regName').value.trim();
-      const lastName = document.getElementById('regLastName').value.trim();
-      const age = document.getElementById('regAge').value;
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const taste = document.getElementById('regTaste').value;
-      const avatarFile = document.getElementById('regAvatar').files[0];
-      const submitBtn = document.getElementById('regSubmitBtn');
+      var name = document.getElementById('regName').value.trim();
+      var lastName = document.getElementById('regLastName').value.trim();
+      var age = document.getElementById('regAge').value;
+      var email = document.getElementById('regEmail').value.trim();
+      var password = document.getElementById('regPassword').value;
+      var taste = document.getElementById('regTaste').value;
+      var avatarInput = document.getElementById('regAvatar');
+      var avatarFile = (avatarInput && avatarInput.files) ? avatarInput.files[0] : null;
+      var submitBtn = document.getElementById('regSubmitBtn');
 
       if (!email || !password || !name) {
         showAlert("Ingresa tu nombre, correo y contraseña.");
@@ -512,173 +564,185 @@
 
       try {
         submitBtn.disabled = true;
-        submitBtn.innerText = "REGISTRANDO Y GUARDANDO...";
+        submitBtn.innerText = "REGISTRANDO...";
 
-        // 1. Crear Usuario
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        let photoURL = "";
-
-        // 2. Subir avatar si seleccionó
+        var photoURL = "";
         if (avatarFile) {
-          try {
-            const storageRef = ref(storage, `avatars/${user.uid}_${avatarFile.name}`);
-            await uploadBytes(storageRef, avatarFile);
-            photoURL = await getDownloadURL(storageRef);
-          } catch (stErr) {
-            console.warn("Storage upload error:", stErr);
-          }
+          photoURL = await new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.onerror = function() { resolve(""); };
+            reader.readAsDataURL(avatarFile);
+          });
         }
 
-        // 3. Guardar Datos en Firestore (Colección users)
-        await setDoc(doc(db, "users", user.uid), {
+        var authResp = await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: { 
+            data: { 
+              nombre: name, 
+              apellido: lastName, 
+              edad: age ? Number(age) : null, 
+              gustos: taste || "movie",
+              foto_perfil: photoURL
+            } 
+          }
+        });
+
+        if (authResp.error) throw authResp.error;
+
+        var user = authResp.data.user;
+        var userProfile = {
+          id: user ? user.id : "user_" + Date.now(),
+          email: email,
           nombre: name,
           apellido: lastName,
           edad: age ? Number(age) : null,
-          email: email,
-          gustos: taste,
-          fotoPerfil: photoURL,
-          creadoEn: new Date().toISOString()
-        });
+          gustos: taste || "movie",
+          foto_perfil: photoURL
+        };
 
-        showAlert("¡Cuenta registrada con éxito en la base de datos!", false);
-        setTimeout(() => window.closeAuthModal(), 1200);
+        saveUserSession(userProfile);
+        showAlert("¡Registrado con éxito!", false);
+        setTimeout(function() { 
+          window.closeAuthModal(); 
+          window.location.href = "perfil.html"; 
+        }, 1000);
 
       } catch (error) {
-        console.error("Register Error:", error);
-        showAlert(error.code === 'auth/email-already-in-use' ? "Este correo ya está en uso." : "Error: " + error.message);
+        console.error("Error en Registro:", error);
+        showAlert(error.message || "Error al registrarse en el sistema.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Completar Registro";
       }
     };
 
-    /* INICIAR SESIÓN CON EMAIL */
-    window.loginWithEmail = async () => {
+    window.loginWithEmail = async function() {
       clearAlert();
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const submitBtn = document.getElementById('loginSubmitBtn');
+      var email = document.getElementById('loginEmail').value.trim();
+      var password = document.getElementById('loginPassword').value;
+      var submitBtn = document.getElementById('loginSubmitBtn');
 
       try {
         submitBtn.disabled = true;
         submitBtn.innerText = "ENTRANDO...";
-        await signInWithEmailAndPassword(auth, email, password);
-        showAlert("¡Sesión iniciada!", false);
-        setTimeout(() => window.closeAuthModal(), 1000);
+
+        var loginResp = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (loginResp.error) throw loginResp.error;
+
+        var user = loginResp.data.user;
+        var uMeta = user.user_metadata || {};
+        var userProfile = {
+          id: user.id,
+          email: user.email,
+          nombre: uMeta.nombre || email.split('@')[0],
+          apellido: uMeta.apellido || "",
+          edad: uMeta.edad || null,
+          gustos: uMeta.gustos || "movie",
+          foto_perfil: uMeta.foto_perfil || ""
+        };
+
+        saveUserSession(userProfile);
+        showAlert("¡Sesión iniciada correctamente!", false);
+        setTimeout(function() { 
+          window.closeAuthModal(); 
+          window.location.href = "perfil.html"; 
+        }, 800);
       } catch (error) {
-        showAlert("Correo o contraseña incorrectos.");
+        console.error("Login Error:", error);
+        showAlert(error.message || "Correo o contraseña incorrectos.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Entrar a mi espacio";
       }
     };
 
-    /* GOOGLE AUTH */
-    window.loginWithGoogle = async () => {
+    window.loginWithGoogle = async function() {
       clearAlert();
       try {
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-          await setDoc(userRef, {
-            nombre: user.displayName ? user.displayName.split(' ')[0] : 'Usuario',
-            apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
-            email: user.email,
-            fotoPerfil: user.photoURL || '',
-            gustos: 'movie',
-            creadoEn: new Date().toISOString()
-          });
-        }
-
-        showAlert("¡Conectado con Google!", false);
-        setTimeout(() => window.closeAuthModal(), 1000);
+        var oauthResp = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin + window.location.pathname }
+        });
+        if (oauthResp && oauthResp.error) throw oauthResp.error;
       } catch (error) {
         showAlert("Error Google: " + error.message);
       }
     };
 
-    /* CERRAR SESIÓN */
-    window.logoutUser = async () => {
-      await signOut(auth);
+    window.logoutUser = async function() {
+      try { await supabaseClient.auth.signOut(); } catch(e){}
+      clearUserSession();
       window.location.reload();
     };
 
-    /* ESCUCHADOR PERMANENTE DE SESIÓN EN TIEMPO REAL */
-    onAuthStateChanged(auth, async (user) => {
-      const navUserLabel = document.getElementById('navUserLabel');
-      const navUserBtn = document.getElementById('navUserBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const heroSignInBtn = document.getElementById('heroSignInBtn');
-
-      if (user) {
-        let userName = user.displayName || user.email.split('@')[0];
-        let userPhoto = user.photoURL;
-
-        try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            if (data.nombre) userName = data.nombre;
-            if (data.fotoPerfil) userPhoto = data.fotoPerfil;
-          }
-        } catch (e) {
-          console.warn("User lookup error:", e);
-        }
-
-        if (navUserLabel) navUserLabel.innerText = userName.toUpperCase();
-        if (logoutBtn) logoutBtn.classList.remove('hidden');
-
-        if (navUserBtn) {
-          navUserBtn.onclick = () => window.location.href = "perfil.html";
-          if (userPhoto) {
-            navUserBtn.innerHTML = `
-              <img src="${userPhoto}" class="w-4 h-4 rounded-full object-cover border border-white">
-              <span class="uppercase tracking-wider font-mono text-xs">${userName}</span>
-            `;
-          } else {
-            navUserBtn.innerHTML = `
-              <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-              <span class="uppercase tracking-wider font-mono text-xs">${userName}</span>
-            `;
+    // Inicialización al cargar la página
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Verificar si hay sesión activa en Supabase
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        if (data && data.session && data.session.user) {
+          const user = data.session.user;
+          const meta = user.user_metadata || {};
+          const activeProfile = {
+            id: user.id,
+            email: user.email,
+            nombre: meta.nombre || user.email.split('@')[0],
+            apellido: meta.apellido || '',
+            edad: meta.edad || null,
+            gustos: meta.gustos || 'movie',
+            foto_perfil: meta.foto_perfil || ''
+          };
+          saveUserSession(activeProfile);
+        } else {
+          var savedUser = getStoredUserSession();
+          if (savedUser) {
+            updateUIWithUser(savedUser);
           }
         }
-
-        if (heroSignInBtn) {
-          heroSignInBtn.innerHTML = `<span>HOLA, ${userName.toUpperCase()} (IR A PERFIL)</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-          heroSignInBtn.onclick = () => window.location.href = "perfil.html";
-        }
-      } else {
-        if (navUserLabel) navUserLabel.innerText = "ENTRAR";
-        if (logoutBtn) logoutBtn.classList.add('hidden');
-        if (navUserBtn) {
-          navUserBtn.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>`;
-          navUserBtn.onclick = () => openAuthModal();
-        }
-        if (heroSignInBtn) {
-          heroSignInBtn.innerHTML = `<span>Sign in / Registrarse</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-          heroSignInBtn.onclick = () => openAuthModal();
-        }
+      } catch (e) {
+        var savedUser = getStoredUserSession();
+        if (savedUser) updateUIWithUser(savedUser);
       }
-      lucide.createIcons();
+    });
+
+    supabaseClient.auth.onAuthStateChange(async function(event, session) {
+      if (session && session.user) {
+        var user = session.user;
+        var uMeta = user.user_metadata || {};
+        var activeProfile = {
+          id: user.id,
+          email: user.email,
+          nombre: uMeta.nombre || user.email.split('@')[0],
+          apellido: uMeta.apellido || '',
+          edad: uMeta.edad || null,
+          gustos: uMeta.gustos || 'movie',
+          foto_perfil: uMeta.foto_perfil || ''
+        };
+        saveUserSession(activeProfile);
+      }
     });
   </script>
 
-  <!-- LÓGICA DE INTERFAZ & THREE.JS -->
+  <!-- ==========================================
+       THREE.JS Y CONTROLES UI
+  =========================================== -->
   <script>
     lucide.createIcons();
 
-    let isMenuOpen = false;
+    var isMenuOpen = false;
     function toggleMenu() {
       isMenuOpen = !isMenuOpen;
-      const sideMenu = document.getElementById('sideMenu');
-      const menuOverlay = document.getElementById('menuOverlay');
-      const line1 = document.getElementById('line1');
-      const line2 = document.getElementById('line2');
+      var sideMenu = document.getElementById('sideMenu');
+      var menuOverlay = document.getElementById('menuOverlay');
+      var line1 = document.getElementById('line1');
+      var line2 = document.getElementById('line2');
 
       if (isMenuOpen) {
         sideMenu.classList.remove('-translate-x-full');
@@ -693,32 +757,34 @@
       }
     }
 
-    let scene, camera, renderer, bookMesh;
-    let isDragging3D = false;
-    let previousMousePosition = { x: 0, y: 0 };
+    var scene, camera, renderer, bookMesh;
+    var isDragging3D = false;
+    var previousMousePosition = { x: 0, y: 0 };
 
     function init3D() {
-      const container = document.getElementById('threeCanvas').parentElement;
-      const width = container.clientWidth;
-      const height = container.clientHeight;
+      var canvasElement = document.getElementById('threeCanvas');
+      if (!canvasElement) return;
+      var container = canvasElement.parentElement;
+      var width = container.clientWidth;
+      var height = container.clientHeight;
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
       camera.position.set(0, 0, 7);
 
-      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas'), alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ canvas: canvasElement, alpha: true, antialias: true });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      var ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      var dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
       dirLight.position.set(5, 5, 5);
       scene.add(dirLight);
 
-      const geometry = new THREE.BoxGeometry(2.4, 3.2, 0.5);
-      const materials = [
+      var geometry = new THREE.BoxGeometry(2.4, 3.2, 0.5);
+      var materials = [
         new THREE.MeshStandardMaterial({ color: 0x111111 }),
         new THREE.MeshStandardMaterial({ color: 0x111111 }),
         new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }),
@@ -732,11 +798,10 @@
       bookMesh.rotation.x = 0.2;
       scene.add(bookMesh);
 
-      const canvas = document.getElementById('threeCanvas');
-      canvas.addEventListener('mousedown', () => { isDragging3D = true; });
-      canvas.addEventListener('mousemove', (e) => {
+      canvasElement.addEventListener('mousedown', function() { isDragging3D = true; });
+      canvasElement.addEventListener('mousemove', function(e) {
         if (isDragging3D) {
-          const deltaMove = {
+          var deltaMove = {
             x: e.offsetX - previousMousePosition.x,
             y: e.offsetY - previousMousePosition.y
           };
@@ -745,7 +810,7 @@
         }
         previousMousePosition = { x: e.offsetX, y: e.offsetY };
       });
-      window.addEventListener('mouseup', () => { isDragging3D = false; });
+      window.addEventListener('mouseup', function() { isDragging3D = false; });
 
       window.addEventListener('resize', onWindowResize);
       animate3D();
@@ -762,25 +827,36 @@
     }
 
     function onWindowResize() {
-      const container = document.getElementById('threeCanvas').parentElement;
+      var canvasElement = document.getElementById('threeCanvas');
+      if (!canvasElement) return;
+      var container = canvasElement.parentElement;
       if (!container) return;
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     }
 
-    function setCategory(catKey, catName, hexColor) {
+    window.setCategory = function(catKey, catName, hexColor) {
       document.getElementById('heroCategoryText').innerText = catName;
-      document.getElementById('bookLabel').innerText = `CUBIERTA: ${catName.toUpperCase()} DIARY 2026`;
+      document.getElementById('bookLabel').innerText = 'CUBIERTA: ' + catName.toUpperCase() + ' DIARY 2026';
       if (bookMesh) {
         bookMesh.material[4].color.setHex(hexColor);
         bookMesh.material[5].color.setHex(hexColor);
       }
-    }
+    };
 
     window.onload = function() {
       init3D();
     };
+
+    window.addEventListener('storage', function(event) {
+      if (event.key === 'book_user_session') {
+        var updatedUser = event.newValue ? JSON.parse(event.newValue) : null;
+        if (typeof updateUIWithUser === 'function') {
+          updateUIWithUser(updatedUser);
+        }
+      }
+    });
   </script>
 </body>
 </html>
