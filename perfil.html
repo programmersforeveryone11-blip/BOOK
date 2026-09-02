@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil — BOOK Luizabeth's Studios</title>
+  <link rel="icon" type="image/png" href="f i l m s 1.png">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Space Grotesk', 'monospace'],
+            archivo: ['Archivo Black', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .bg-grid-pattern {
+      background-color: #f7f7f8;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="bg-grid-pattern text-black font-sans antialiased min-h-screen flex flex-col justify-between">
+
+  <!-- TOP BAR -->
+  <header class="w-full bg-white/90 backdrop-blur-md border-b border-black/10 px-6 py-4 flex items-center justify-between">
+    <a href="web.html" class="font-archivo text-xl tracking-tighter uppercase inline-block">
+      ← VOLVER A BOOK
+    </a>
+    <div id="userHeaderEmail" class="text-xs font-mono text-neutral-500"></div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-4xl mx-auto w-full px-4 py-12 flex-grow">
+    <div class="bg-white border border-black rounded-2xl shadow-xl overflow-hidden p-6 md:p-10">
+      
+      <div class="flex flex-col md:flex-row items-center gap-6 pb-8 border-b border-black/10">
+        <div id="profileAvatarContainer" class="w-24 h-24 rounded-full bg-black text-white flex items-center justify-center font-archivo text-3xl overflow-hidden border-2 border-black">
+          <span id="profileInitial">U</span>
+        </div>
+        <div class="text-center md:text-left">
+          <span class="text-xs font-mono uppercase tracking-widest text-neutral-400">Panel de Usuario</span>
+          <h1 id="profileNameTitle" class="font-archivo text-3xl md:text-4xl uppercase tracking-tight mt-1">Cargando...</h1>
+          <p id="profileEmailSubtitle" class="text-xs font-mono text-neutral-600 mt-1"></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="p-5 bg-neutral-50 rounded-xl border border-black/10">
+          <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 block mb-1">Nombre Completo</span>
+          <p id="infoName" class="font-mono font-bold text-base">-</p>
+        </div>
+
+        <div class="p-5 bg-neutral-50 rounded-xl border border-black/10">
+          <span class="text-[10px] tracking-widest uppercase font-mono text-neutral-500 block mb-1">Edad</span>
+          <p id="infoAge" class="font-mono font-bold text-base">-</p>
+        </div>
+
+        <div class="p-5 bg-neutral-50 rounded-xl border border-black/10">
+          <span class="text-[10px] tracking-widest uppercase font-mono text-neutral-500 block mb-1">Categoría / Gusto Favorito</span>
+          <p id="infoTaste" class="font-mono font-bold text-base uppercase">-</p>
+        </div>
+
+        <div class="p-5 bg-neutral-50 rounded-xl border border-black/10">
+          <span class="text-[10px] tracking-widest uppercase font-mono text-neutral-500 block mb-1">ID de Usuario (Supabase)</span>
+          <p id="infoId" class="font-mono text-xs text-neutral-600 break-all">-</p>
+        </div>
+      </div>
+
+      <div class="mt-10 pt-6 border-t border-black/10 flex flex-wrap gap-4 justify-between items-center">
+        <a href="web.html" class="px-5 py-2.5 bg-black text-white font-mono text-xs uppercase tracking-widest rounded-lg hover:bg-neutral-800 transition-colors">
+          Ir al Inicio
+        </a>
+        <button onclick="logoutSession()" class="px-5 py-2.5 bg-red-100 text-red-700 font-mono text-xs uppercase tracking-widest rounded-lg hover:bg-red-200 transition-colors">
+          Cerrar Sesión
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full text-center py-6 text-xs font-mono text-neutral-500 border-t border-black/10">
+    LUIZABETH'S.STUDIOS © 2026 — Todos los derechos reservados
+  </footer>
+
+  <!-- SCRIPT DE PERFIL -->
+  <script>
+    const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const LOCAL_SESSION_KEY = 'book_user_session';
+
+    async function loadUserProfile() {
+      let sessionData = null;
+      
+      // 1. Obtener sesión de Supabase con timeout de seguridad para evitar bloqueos
+      try {
+        const sessionPromise = supabaseClient.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000));
+        
+        const { data } = await Promise.race([sessionPromise, timeoutPromise]);
+        if (data && data.session && data.session.user) {
+          const user = data.session.user;
+          const meta = user.user_metadata || {};
+          sessionData = {
+            id: user.id,
+            email: user.email,
+            nombre: meta.nombre || user.email.split('@')[0],
+            apellido: meta.apellido || '',
+            edad: meta.edad || 'No especificada',
+            gustos: meta.gustos || '-',
+            foto_perfil: meta.foto_perfil || null
+          };
+        }
+      } catch (e) {
+        console.warn("Aviso de Supabase session:", e);
+      }
+
+      // 2. Respaldo por localStorage si Supabase Auth tardó o no devolvió datos activos directos
+      if (!sessionData) {
+        const stored = localStorage.getItem(LOCAL_SESSION_KEY);
+        if (stored) {
+          try { sessionData = JSON.parse(stored); } catch(err) {}
+        }
+      }
+
+      // 3. Si no hay ningún registro de sesión, redirigir de forma segura
+      if (!sessionData) {
+        try {
+          if (window.parent && window.parent !== window) {
+            // Entorno de preview iframe
+            console.log("Sesión no encontrada en preview.");
+          } else {
+            window.location.href = 'web.html';
+          }
+        } catch(err) {
+          window.location.href = 'web.html';
+        }
+        return;
+      }
+
+      // Pintar datos de manera segura en el DOM
+      document.getElementById('profileNameTitle').innerText = (sessionData.nombre || 'Usuario') + ' ' + (sessionData.apellido || '');
+      document.getElementById('profileEmailSubtitle').innerText = sessionData.email || '';
+      document.getElementById('userHeaderEmail').innerText = sessionData.email || '';
+      document.getElementById('infoName').innerText = (sessionData.nombre || '-') + ' ' + (sessionData.apellido || '');
+      document.getElementById('infoAge').innerText = sessionData.edad || 'No especificada';
+      document.getElementById('infoTaste').innerText = sessionData.gustos || '-';
+      document.getElementById('infoId').innerText = sessionData.id || '-';
+
+      const avatarContainer = document.getElementById('profileAvatarContainer');
+      if (sessionData.foto_perfil) {
+        avatarContainer.innerHTML = '<img src="' + sessionData.foto_perfil + '" class="w-full h-full object-cover">';
+      } else if (sessionData.nombre) {
+        document.getElementById('profileInitial').innerText = sessionData.nombre.charAt(0).toUpperCase();
+      }
+    }
+
+    async function logoutSession() {
+      try { await supabaseClient.auth.signOut(); } catch(e) {}
+      localStorage.removeItem(LOCAL_SESSION_KEY);
+      try {
+        window.location.href = 'web.html';
+      } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUserProfile);
+  </script>
+</body>
+</html>
