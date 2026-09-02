@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — PÁGINA NO ENCONTRADA | BOOK</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700&family=Playfair+Display:ital,wght@1,400;1,600&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Space Grotesk', 'monospace'],
+            archivo: ['Archivo Black', 'sans-serif'],
+            serif404: ['Playfair Display', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Cuadrícula técnica de fondo */
+    .bg-grid-pattern {
+      background-color: #f7f7f8;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    }
+
+    /* Menú lateral slide */
+    .side-menu-drawer {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Número gigante 404 */
+    .giant-404-number {
+      font-size: clamp(160px, 30vw, 420px);
+      line-height: 0.8;
+      font-weight: 300;
+      letter-spacing: -0.05em;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="bg-[#f7f7f8] text-black font-sans antialiased selection:bg-black selection:text-white min-h-screen flex flex-col justify-between">
+
+  <!-- ==========================================
+       BARRA DE NAVEGACIÓN SUPERIOR (TOP NAVBAR)
+  =========================================== -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-black/10 px-4 md:px-8 py-3 flex items-center justify-between">
+    
+    <!-- Menú Hamburguesa -->
+    <div class="flex items-center gap-4">
+      <button id="menuBtn" onclick="toggleMenu()" class="group flex flex-col justify-center items-center w-8 h-8 focus:outline-none z-50 relative" aria-label="Abrir Menú">
+        <span id="line1" class="w-6 h-[2px] bg-black transition-all duration-300 transform origin-center translate-y-[-3px]"></span>
+        <span id="line2" class="w-6 h-[2px] bg-black transition-all duration-300 transform origin-center translate-y-[3px]"></span>
+      </button>
+      <span class="text-xs font-mono tracking-widest uppercase hidden sm:inline-block">MENU</span>
+    </div>
+
+    <!-- LOGO CENTRAL -->
+    <div class="text-center">
+      <a href="index.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
+        BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
+      </a>
+    </div>
+
+    <!-- BUSCADOR Y CARRITO -->
+    <div class="flex items-center gap-3 md:gap-5">
+      <form action="index.html" method="GET" class="relative hidden sm:flex items-center">
+        <input type="text" name="q" placeholder="Buscar libros, diarios..." class="w-40 lg:w-56 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
+        <button type="submit" aria-label="Buscar"><i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 top-2.5 text-black"></i></button>
+      </form>
+
+      <a href="tienda.html" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+        <span class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MENÚ LATERAL (SIDE DRAWER)
+  =========================================== -->
+  <div id="sideMenu" class="fixed top-0 left-0 w-full sm:w-[380px] h-full bg-black text-white z-40 transform -translate-x-full side-menu-drawer pt-24 px-8 pb-10 flex flex-col justify-between shadow-2xl">
+    <div>
+      <div class="flex items-center justify-between border-b border-white/20 pb-4 mb-6">
+        <span class="text-xs font-mono text-neutral-400 uppercase tracking-widest">Navegación</span>
+        <button onclick="toggleMenu()" class="text-xs font-mono text-neutral-400 hover:text-white flex items-center gap-1">
+          <i data-lucide="x" class="w-4 h-4"></i> CERRAR
+        </button>
+      </div>
+
+      <nav class="space-y-4">
+        <a href="index.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Inicio</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+        <a href="perfil.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Mis libros</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Tienda</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+        <a href="app.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>App</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+        <a href="comunidad.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Comunidad</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+      </nav>
+    </div>
+
+    <div class="border-t border-white/20 pt-6">
+      <div class="text-xs font-mono text-neutral-400">BOOK ARCHIVE</div>
+      <div class="text-[10px] text-neutral-500 mt-1">LUIZABETH'S.STUDIOS © 2026</div>
+    </div>
+  </div>
+
+  <div id="menuOverlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/60 z-30 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <!-- ==========================================
+       SECCIÓN ÚNICA PRINCIPAL 404
+  =========================================== -->
+  <main class="flex-grow bg-grid-pattern pt-24 pb-8 px-4 md:px-12 flex flex-col justify-between items-center relative overflow-hidden">
+    
+    <!-- Etiquetas superiores -->
+    <div class="w-full max-w-7xl mx-auto flex justify-between items-center text-[11px] font-mono text-neutral-500 pt-2">
+      <span class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-black inline-block"></span>
+        <span>SYS_STATUS // 404_PAGE_NOT_FOUND</span>
+      </span>
+      <span>[ FIG. 404 — BITÁCORA EXTRAVIADA ]</span>
+    </div>
+
+    <!-- COMPOSICIÓN 404 -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto my-auto py-6 flex items-center justify-center select-none">
+      
+      <div class="flex items-center justify-center w-full relative">
+        
+        <!-- PRIMER '4' -->
+        <span class="font-serif404 giant-404-number text-black tracking-tighter inline-block transform -translate-x-1 sm:-translate-x-3">
+          4
+        </span>
+
+        <!-- '0' OVALADO CENTRAL -->
+        <div class="relative flex-shrink-0 flex items-center justify-center mx-[-10px] sm:mx-[-20px] lg:mx-[-35px]">
+          
+          <div class="w-[260px] h-[340px] sm:w-[320px] sm:h-[420px] md:w-[380px] md:h-[480px] lg:w-[420px] lg:h-[500px] border-[10px] sm:border-[16px] md:border-[20px] border-black rounded-[50%] flex flex-col items-center justify-center text-center p-6 sm:p-10 bg-white/95 shadow-xl">
+            
+            <div class="space-y-3 sm:space-y-4 max-w-[280px]">
+              
+              <div class="inline-block px-2.5 py-0.5 bg-black text-white text-[9px] sm:text-[10px] font-mono tracking-widest uppercase">
+                ERROR CODE 404
+              </div>
+
+              <h1 class="font-serif404 text-2xl sm:text-3xl md:text-4xl italic text-black leading-tight font-normal">
+                Page Not Available
+              </h1>
+
+              <p class="text-[11px] sm:text-xs text-neutral-600 font-sans leading-relaxed">
+                Lo sentimos, la página o el libro que buscas no está disponible en nuestro estante digital o ha cambiado de dirección.
+              </p>
+
+              <!-- Botones principales -->
+              <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+                <a href="index.html" class="w-full sm:w-auto px-5 py-2.5 bg-black text-white hover:bg-neutral-800 rounded-full font-mono text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                  <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                  <span>Volver al inicio</span>
+                </a>
+
+                <a href="tienda.html" class="w-full sm:w-auto px-4 py-2.5 border border-black hover:bg-black hover:text-white rounded-full font-mono text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                  <span>Tienda</span>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- SEGUNDO '4' -->
+        <span class="font-serif404 giant-404-number text-black tracking-tighter inline-block transform translate-x-1 sm:translate-x-3">
+          4
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- Marcadores de posición flotantes en el área central (L y J de la imagen) -->
+    <div class="absolute top-1/3 left-[35%] font-mono text-xs text-neutral-400 select-none hidden md:block">L</div>
+    <div class="absolute top-1/3 right-[35%] font-mono text-xs text-neutral-400 select-none hidden md:block">J</div>
+
+  </main>
+
+  <script>
+    // Inicializar iconos
+    lucide.createIcons();
+
+    // Control del menú lateral
+    let isMenuOpen = false;
+    function toggleMenu() {
+      isMenuOpen = !isMenuOpen;
+      const sideMenu = document.getElementById('sideMenu');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const line1 = document.getElementById('line1');
+      const line2 = document.getElementById('line2');
+
+      if (isMenuOpen) {
+        sideMenu.classList.remove('-translate-x-full');
+        menuOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        line1.classList.add('rotate-45', 'translate-y-[0px]');
+        line2.classList.add('-rotate-45', 'translate-y-[0px]');
+      } else {
+        sideMenu.classList.add('-translate-x-full');
+        menuOverlay.classList.add('opacity-0', 'pointer-events-none');
+        line1.classList.remove('rotate-45', 'translate-y-[0px]');
+        line2.classList.remove('-rotate-45', 'translate-y-[0px]');
+      }
+    }
+  </script>
+</body>
+</html>
