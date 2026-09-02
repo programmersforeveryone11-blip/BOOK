@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOOK — Luizabeth's Studios</title>
-  <link rel="icon" type="image/png" href="f i l m s 1.png">
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Syne, Space Grotesk, Archivo Black & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,8 +64,54 @@
       background-color: #0d0d0d;
     }
 
+    .corner-bracket {
+      position: relative;
+    }
+    .corner-bracket::before {
+      content: "┌";
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+    .corner-bracket::after {
+      content: "┐";
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+    .corner-bracket-bottom::before {
+      content: "└";
+      position: absolute;
+      bottom: -6px;
+      left: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+    .corner-bracket-bottom::after {
+      content: "┘";
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+
     .side-menu-drawer {
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide-img {
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-out;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     @keyframes fadeIn {
@@ -83,6 +130,7 @@
   =========================================== -->
   <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-black/10 px-4 md:px-8 py-3 flex items-center justify-between">
     
+    <!-- Menú Hamburguesa de 2 líneas (Izquierda) -->
     <div class="flex items-center gap-4">
       <button id="menuBtn" onclick="toggleMenu()" class="group flex flex-col justify-center items-center w-8 h-8 focus:outline-none z-50 relative" aria-label="Abrir Menú">
         <span id="line1" class="w-6 h-[2px] bg-black transition-all duration-300 transform origin-center translate-y-[-3px]"></span>
@@ -91,15 +139,17 @@
       <span class="text-xs font-mono tracking-widest uppercase hidden sm:inline-block">MENU</span>
     </div>
 
+    <!-- LOGO CENTRAL -->
     <div class="text-center">
-      <a href="web.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
+      <a href="index.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
         BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
       </a>
     </div>
 
+    <!-- BUSCADOR, USUARIO Y CARRITO (Derecha) -->
     <div class="flex items-center gap-3 md:gap-5">
       <div class="relative hidden sm:flex items-center">
-        <input type="text" placeholder="Buscar libros, diarios..." class="w-36 lg:w-48 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
+        <input type="text" placeholder="Buscar libros, diarios..." class="w-40 lg:w-56 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
         <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 text-black"></i>
       </div>
 
@@ -108,7 +158,7 @@
         <span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>
       </button>
 
-      <a href="javascript:void(0)" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
+      <a href="tienda.html" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
         <i data-lucide="shopping-bag" class="w-5 h-5"></i>
         <span class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
       </a>
@@ -144,7 +194,7 @@
           </svg>
         </a>
 
-        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Tienda</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -152,7 +202,7 @@
           </svg>
         </a>
 
-        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="app.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>App</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -160,7 +210,7 @@
           </svg>
         </a>
 
-        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Membresia</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -168,7 +218,7 @@
           </svg>
         </a>
 
-        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="santuario.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Grafiti</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -176,7 +226,7 @@
           </svg>
         </a>
 
-        <a href="javascript:void(0)" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="comunidad.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Comunidad-biblioteca</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -200,12 +250,13 @@
   <div id="menuOverlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/60 z-30 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
   <!-- ==========================================
-       HERO SECTION
+       HERO SECTION (CON FONDO ESTILO IMG 4 & LIBRO 3D)
   =========================================== -->
   <section class="min-h-screen bg-grid-pattern pt-28 pb-16 px-4 md:px-12 flex flex-col justify-between relative overflow-hidden border-b border-black">
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-7xl mx-auto w-full my-auto">
       
+      <!-- IZQUIERDA: Tipografía grande Movie / Book + Sign In + Selector -->
       <div class="lg:col-span-6 z-10">
         <div class="mb-4 inline-block px-2.5 py-1 bg-black text-white text-[10px] font-mono tracking-widest uppercase">
           Edición Especial 2026
@@ -236,6 +287,7 @@
         </div>
       </div>
 
+      <!-- DERECHA: LIBRO INTERACTIVO 3D (THREE.JS) -->
       <div class="lg:col-span-6 relative flex flex-col items-center justify-center">
         <div class="w-full h-[360px] md:h-[450px] relative rounded-lg border border-black/20 bg-white/50 backdrop-blur-sm shadow-xl overflow-hidden cursor-grab active:cursor-grabbing">
           <canvas id="threeCanvas" class="w-full h-full"></canvas>
@@ -256,72 +308,527 @@
   </section>
 
   <!-- ==========================================
-       SECCIÓN DE LIBRERÍA & NOVEDADES
+       SECCIÓN 2: LIBRO DESTACADO + INFO & GUÍA DE USO
+  =========================================== -->
+  <section class="py-16 px-4 md:px-12 bg-white border-b border-black">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <div class="lg:col-span-8 flex flex-col md:flex-row gap-8 items-center">
+          <div class="w-full md:w-1/2 aspect-[3/4] bg-neutral-900 rounded-sm relative overflow-hidden shadow-2xl group">
+            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800" alt="Diario de Cine y Amor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            <div class="absolute bottom-4 left-4 right-4 text-white font-mono text-xs">
+              <span class="bg-white text-black px-2 py-0.5 font-bold">Novedad</span>
+              <p class="mt-2 text-sm font-bold">Diario de Rodaje & Cinefilia</p>
+            </div>
+          </div>
+
+          <div class="w-full md:w-1/2 space-y-4">
+            <span class="text-xs font-mono tracking-widest text-neutral-500 uppercase">Serie Limitada</span>
+            <h2 class="text-2xl font-bold font-syne tracking-tight">Bitácora Personalizada para Historias, Guiones e Ideas.</h2>
+            <p class="text-sm text-neutral-600 leading-relaxed">
+              Diseñado en papel grueso de 120g con tapa dura mate. Espacio estructurado para registrar cada película, concepto visual, listas de producción y reflexiones diarias.
+            </p>
+
+            <div class="pt-4">
+              <a href="coleccion.html" class="group inline-flex items-center gap-4 text-base font-bold uppercase tracking-wider hover:opacity-75 transition-opacity">
+                <svg class="w-16 h-5 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="0" y1="10" x2="88" y2="10" />
+                  <polygon points="82,3 98,10 82,17" fill="currentColor" />
+                </svg>
+                <span>Mirar libros</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 flex justify-end">
+          <div class="border border-black p-6 bg-[#f9f9f9] max-w-sm w-full relative corner-bracket corner-bracket-bottom">
+            <div class="flex items-center justify-between border-b border-black/20 pb-3 mb-3">
+              <span class="font-mono text-xs font-bold uppercase tracking-widest">INFO E GUÍA DE USO</span>
+              <i data-lucide="compass" class="w-4 h-4"></i>
+            </div>
+            <ul class="text-xs space-y-2.5 font-mono text-neutral-700">
+              <li class="flex items-start gap-2">
+                <span class="font-bold">01.</span>
+                <span>Selecciona la plantilla de contenido según tu hábito creativo.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold">02.</span>
+                <span>Personaliza la paleta de color exterior y número de páginas.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold">03.</span>
+                <span>Publica digitalmente en la biblioteca comunitaria o recibe tu ejemplar impreso.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================================================================================== -->
+  <!--   SECCIÓN 3: VISUAL ATMOSPHERE / BANNERS EN CAMBIO CONSTANTE (CARRUSEL INTERACTIVO)  -->
+  <!-- ==================================================================================== -->
+  <section class="bg-neutral-950 py-12 border-b border-black overflow-hidden relative select-none">
+    <div class="max-w-7xl mx-auto px-4">
+      
+      <!-- Encabezado del Banner -->
+      <div class="text-xs font-mono text-neutral-300 mb-4 uppercase tracking-widest flex items-center justify-between flex-wrap gap-2">
+        <span class="flex items-center gap-2">
+          <i data-lucide="film" class="w-4 h-4 text-white"></i>
+          VISUAL ATMOSPHERE / BANNERS EN CAMBIO CONSTANTE (17 ESCENAS)
+        </span>
+        <div class="flex items-center gap-4">
+          <span id="slideCounter" class="font-mono text-[11px] text-neutral-400">01 / 17</span>
+          <span class="animate-pulse flex items-center gap-1 font-bold text-red-500">
+            <span class="w-2 h-2 rounded-full bg-red-600 inline-block"></span> EN VIVO
+          </span>
+        </div>
+      </div>
+
+      <!-- Contenedor Principal del Slider Touch/Drag -->
+      <div id="sliderContainer" class="relative w-full h-[380px] sm:h-[540px] md:h-[620px] rounded-lg overflow-hidden border border-neutral-800 clean-vibe cursor-grab active:cursor-grabbing touch-pan-y flex items-center justify-center bg-black">
+        
+        <!-- Imagen Actual -->
+        <img id="cinematicSlide" 
+             src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=1200" 
+             alt="Visual Banner Atmosphere" 
+             class="slide-img w-full h-full object-contain max-h-full transition-all duration-500">
+        
+        <!-- Badge de Información sobre la escena actual -->
+        <div class="absolute top-4 left-4 z-10 font-mono text-xs text-white bg-black/85 px-3.5 py-2 rounded-md border border-white/20 flex items-center gap-2 pointer-events-none shadow-lg">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
+          <span id="slideTitle" class="tracking-wide font-medium">SCENE #01 — 500 DAYS OF SUMMER</span>
+        </div>
+
+        <!-- Indicadores en MINIATURAS/PUNTOS -->
+        <div class="absolute bottom-4 left-4 right-20 sm:right-32 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 z-10 pointer-events-auto" id="slideDots">
+        </div>
+        
+        <!-- Botones de Navegación Manual -->
+        <div class="absolute bottom-4 right-4 flex items-center gap-2 z-20">
+          <button onclick="prevSlide()" class="w-10 h-10 bg-white/90 hover:bg-white text-black rounded-full border border-black/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg" aria-label="Anterior">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button onclick="nextSlide()" class="w-10 h-10 bg-white/90 hover:bg-white text-black rounded-full border border-black/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg" aria-label="Siguiente">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Ayuda Visual Gestual -->
+        <div class="absolute top-4 right-4 hidden md:flex items-center gap-1.5 font-mono text-[10px] text-neutral-300 bg-black/80 px-2.5 py-1 rounded border border-white/10 pointer-events-none z-10">
+          <i data-lucide="move-horizontal" class="w-3.5 h-3.5"></i>
+          <span>DESLIZA CON EL TOUCH / RATÓN</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 4: COLECCIÓN (TIRA DE IMÁGENES)
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-[#f7f7f8] border-b border-black">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="mb-12">
+        <h2 class="font-archivo text-6xl sm:text-8xl lg:text-9xl uppercase tracking-tighter text-black">
+          Colección
+        </h2>
+        <p class="font-mono text-xs text-neutral-500 tracking-widest uppercase -mt-2">Catálogo Oficial de Series Limitadas</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-y border-black divide-y sm:divide-y-0 sm:divide-x divide-black bg-white">
+        
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">1 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=600" alt="Coleccion Kill Bill" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 01</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Kill Bill Action Journal</h3>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">2 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="https://images.unsplash.com/photo-1507842229431-7e810a916790?auto=format&fit=crop&q=80&w=600" alt="Coleccion Breaking Bad" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 02</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Chemistry Chronicles</h3>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">3 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=600" alt="Coleccion Call Me By Your Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 03</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Cinema Romance</h3>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">4 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="https://images.unsplash.com/photo-1517649763962-0c6232660102?auto=format&fit=crop&q=80&w=600" alt="Coleccion Sports Journal" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 04</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Athlete & Sports Diary</h3>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <a href="coleccion.html" class="group inline-flex items-center gap-4 text-sm md:text-base font-bold uppercase tracking-widest hover:opacity-75 transition-opacity">
+          <span>Ve más colecciones de libros</span>
+          <svg class="w-16 h-5 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="0" y1="10" x2="88" y2="10" />
+            <polygon points="82,3 98,10 82,17" fill="currentColor" />
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 5: CREADO POR LUIZABETH'S.STUDIOS
   =========================================== -->
   <section class="py-20 px-4 md:px-12 bg-white border-b border-black">
     <div class="max-w-7xl mx-auto">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 pb-4 border-b border-black/10">
-        <div>
-          <span class="text-xs font-mono text-neutral-400 uppercase tracking-widest block mb-1">COLECCIÓN DE LIBROS DIGITALES</span>
-          <h2 class="font-archivo text-3xl md:text-5xl uppercase tracking-tight">Diarios Populares</h2>
+      
+      <div class="mb-12 border-b border-black pb-6">
+        <h2 class="font-archivo text-5xl md:text-7xl lg:text-8xl tracking-tighter uppercase">
+          Creado por
+        </h2>
+        <span class="font-syne text-2xl md:text-4xl text-neutral-700 tracking-tight block mt-1">
+          luizabeth's.studios
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        
+        <div class="lg:col-span-4 space-y-4">
+          <div class="inline-block px-2 py-0.5 bg-neutral-200 text-neutral-800 font-mono text-[10px] font-bold uppercase">
+            Estudio Venezolano DE DISEÑO
+          </div>
+          <h3 class="font-bold text-xl font-syne">Pasión por la editorialidad, el objeto físico y la memoria visual.</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            Fundada en Venezuela, <strong>luizabeth's.studios</strong> nace de la búsqueda de fusionar el minimalismo cinematográfico con herramientas de registro personal. Diseñamos diarios, libros de arte y experiencias digitales para creativos globales.
+          </p>
+          <div class="pt-2 font-mono text-xs text-neutral-500">
+            Caracas / Valencia, Venezuela — 2026
+          </div>
         </div>
-        <p class="text-xs font-mono text-neutral-600 max-w-xs mt-4 md:mt-0">
-          Diseñados para registrar tus pasiones, resúmenes, bocetos y memorias personalizadas.
+
+        <div class="lg:col-span-5">
+          <div class="aspect-[4/3] bg-neutral-900 border border-black overflow-hidden relative shadow-xl">
+            <img src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=800" alt="Luizabeths Studios Workspace" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
+            <div class="absolute bottom-3 left-3 bg-black text-white font-mono text-[10px] px-2 py-1">
+              STUDIO ARCHIVE / VOL. 1
+            </div>
+          </div>
+        </div>
+
+        <!-- REDES SOCIALES CONFIGURADAS Y FUNCIONALES CON ENLACES DIRECTOS -->
+        <div class="lg:col-span-3 flex flex-col justify-center space-y-3">
+          <span class="font-mono text-xs text-neutral-500 uppercase tracking-widest mb-1">Compartir estudio:</span>
+          
+          <a href="https://www.instagram.com/luizabeths.studios/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">INSTAGRAM</span>
+            <i data-lucide="instagram" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://www.tiktok.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">TIKTOK</span>
+            <i data-lucide="video" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://www.youtube.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">YOUTUBE</span>
+            <i data-lucide="youtube" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://es.pinterest.com/luizabethsstudios/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">PINTEREST</span>
+            <i data-lucide="bookmark" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://x.com/luizabethss" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">TWITTER / X</span>
+            <i data-lucide="twitter" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 6: LIBROS DE LA COMUNIDAD
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-neutral-200 border-b border-black" id="comunidad">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/30 pb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-widest text-neutral-600 block mb-1">BIBLIOTECA ABIERTA</span>
+          <h2 class="font-archivo text-4xl sm:text-6xl uppercase tracking-tight text-black">
+            Libros de la comunidad
+          </h2>
+        </div>
+        <p class="font-mono text-xs text-neutral-600 max-w-xs">
+          Publicaciones creadas y compartidas por nuestra red mundial de lectores y autores.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-neutral-900 text-white p-6 rounded-xl flex flex-col justify-between hover:scale-[1.01] transition-transform">
-          <div>
-            <div class="flex justify-between items-center mb-6">
-              <span class="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-1 rounded">CINE & SERIES</span>
-              <i data-lucide="film" class="w-5 h-5 text-neutral-400"></i>
-            </div>
-            <h3 class="font-archivo text-2xl uppercase mb-2">Movie Diary Vol. 1</h3>
-            <p class="text-xs font-mono text-neutral-400">Organiza películas vistas, críticas, directores favoritos y listados de reproducción.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=600" alt="Diario de Sombras" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">320 págs</span>
           </div>
-          <div class="mt-8 pt-4 border-t border-white/10 flex justify-between items-center">
-            <span class="font-mono text-sm font-bold">$14.99 USD</span>
-            <button onclick="openAuthModal()" class="px-4 py-1.5 bg-white text-black text-xs font-mono rounded-full hover:bg-neutral-200 transition-colors">
-              Obtener
-            </button>
+          <div>
+            <h3 class="font-bold text-base font-syne">Cinema Meme & Cinema Spidey</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@valeria_cine</span>
+            </div>
           </div>
         </div>
 
-        <div class="bg-blue-900 text-white p-6 rounded-xl flex flex-col justify-between hover:scale-[1.01] transition-transform">
-          <div>
-            <div class="flex justify-between items-center mb-6">
-              <span class="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-1 rounded">GAMING</span>
-              <i data-lucide="gamepad-2" class="w-5 h-5 text-blue-300"></i>
-            </div>
-            <h3 class="font-archivo text-2xl uppercase mb-2">Game Backlog Log</h3>
-            <p class="text-xs font-mono text-blue-200">Seguimiento de videojuegos completados, logros, notas de estrategia y reseñas.</p>
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600" alt="Bitacora Gamer" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">180 págs</span>
           </div>
-          <div class="mt-8 pt-4 border-t border-white/10 flex justify-between items-center">
-            <span class="font-mono text-sm font-bold">$14.99 USD</span>
-            <button onclick="openAuthModal()" class="px-4 py-1.5 bg-white text-black text-xs font-mono rounded-full hover:bg-neutral-200 transition-colors">
-              Obtener
-            </button>
+          <div>
+            <h3 class="font-bold text-base font-syne">Detroit: Become Human & Cyber Journal</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@connor_rk800</span>
+            </div>
           </div>
         </div>
 
-        <div class="bg-emerald-900 text-white p-6 rounded-xl flex flex-col justify-between hover:scale-[1.01] transition-transform">
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="https://images.unsplash.com/photo-1561053720-76cd7d72c130?auto=format&fit=crop&q=80&w=600" alt="Bitacora Deportes" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">250 págs</span>
+          </div>
           <div>
-            <div class="flex justify-between items-center mb-6">
-              <span class="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-1 rounded">DEPORTES</span>
-              <i data-lucide="activity" class="w-5 h-5 text-emerald-300"></i>
+            <h3 class="font-bold text-base font-syne">Football Diaries & Jude Stars</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@bellingham_fan</span>
             </div>
-            <h3 class="font-archivo text-2xl uppercase mb-2">Sport Tracker</h3>
-            <p class="text-xs font-mono text-emerald-200">Diario de entrenamiento, metas de rendimiento y estadísticas personales.</p>
           </div>
-          <div class="mt-8 pt-4 border-t border-white/10 flex justify-between items-center">
-            <span class="font-mono text-sm font-bold">$12.99 USD</span>
-            <button onclick="openAuthModal()" class="px-4 py-1.5 bg-white text-black text-xs font-mono rounded-full hover:bg-neutral-200 transition-colors">
-              Obtener
-            </button>
+        </div>
+
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=600" alt="Logbook Atmosferico" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">200 págs</span>
           </div>
+          <div>
+            <h3 class="font-bold text-base font-syne">Logbook de Fotografía & Escenas</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@retro_dev</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <a href="comunidad.html" class="group inline-flex items-center gap-3 font-mono text-sm font-bold uppercase tracking-widest text-black">
+          <span>Ver más</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 transform group-hover:translate-x-2 transition-transform"></i>
+        </a>
+      </div>
+
+      <div class="mt-12 bg-white p-6 md:p-8 border border-black max-w-4xl mx-auto space-y-3">
+        <h4 class="font-syne font-bold text-lg uppercase tracking-tight flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+          ¿Cómo publicar tus propios diarios en BOOK?
+        </h4>
+        <p class="text-xs md:text-sm text-neutral-700 leading-relaxed font-sans">
+          Nuestra comunidad es un espacio abierto para compartir bitácoras de vida, cuadernos de rodaje, anotaciones culinarias y diarios de hábitos. Al finalizar la maquetación de tu libro personalizado en nuestra plataforma, puedes elegir la opción <strong>"Publicar en la Comunidad"</strong>. Tu obra obtendrá un código de archivo único y estará disponible para lectura en formato digital o para ser solicitada bajo demanda física.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 7: PERSONALIZA TUS IDEAS
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-black text-white border-b border-neutral-800 text-center">
+    <div class="max-w-5xl mx-auto">
+      
+      <span class="font-mono text-xs text-neutral-400 tracking-widest uppercase block mb-2">EXPERIENCIA INTERACTIVA</span>
+      <h2 class="font-archivo text-4xl sm:text-6xl uppercase tracking-tight mb-8">
+        Personaliza tus ideas
+      </h2>
+
+      <div class="relative w-full max-w-3xl mx-auto aspect-video rounded-sm overflow-hidden border border-neutral-700 shadow-2xl bg-neutral-900 group">
+        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200" alt="Video Demo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+          <button onclick="playDemoVideo()" class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+            <i data-lucide="play" class="w-8 h-8 fill-black ml-1"></i>
+          </button>
+        </div>
+        <div class="absolute bottom-4 left-4 font-mono text-[11px] text-neutral-300">
+          PROCESO DE MAQUETACIÓN EN TIEMPO REAL
         </div>
       </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 8: BUSCA TU PRÓXIMO BOOK IDEA
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-[#f7f7f8] border-b border-black">
+    <div class="max-w-5xl mx-auto">
+      
+      <div class="max-w-2xl mb-10">
+        <span class="font-mono text-xs text-neutral-500 uppercase tracking-widest block mb-2">GENERADOR EDITORIAL</span>
+        <h2 class="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight leading-none text-black">
+          Busca tu próximo BOOK idea o deja que el destino lo elija
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <div class="bg-white p-5 border border-black rounded-3xl shadow-sm space-y-2">
+          <span class="font-mono text-xs text-neutral-500 uppercase block">01. Colección</span>
+          <select id="selCollection" class="w-full bg-neutral-100 border border-black rounded-full py-2 px-4 text-xs font-mono focus:outline-none">
+            <option value="cine">Cine</option>
+            <option value="libros">Libros</option>
+            <option value="música">Música</option>
+            <option value="juegos">Juegos</option>
+            <option value="comida">Comida</option>
+            <option value="deportes">Deportes</option>
+          </select>
+        </div>
+
+        <div class="bg-white p-5 border border-black rounded-3xl shadow-sm space-y-2">
+          <span class="font-mono text-xs text-neutral-500 uppercase block">02. Color</span>
+          <select id="selColor" class="w-full bg-neutral-100 border border-black rounded-full py-2 px-4 text-xs font-mono focus:outline-none">
+            <option value="Rojo Matte">Rojo</option>
+            <option value="Crema Vintage">Crema</option>
+            <option value="Paletas Verdes">Paletas verdes</option>
+            <option value="Paleta Negra">Paleta negra</option>
+            <option value="Azul Cobalto">Azul</option>
+            <option value="Marrón Cuero">Marrón</option>
+          </select>
+        </div>
+
+        <div class="bg-white p-5 border border-black rounded-3xl shadow-sm space-y-2">
+          <span class="font-mono text-xs text-neutral-500 uppercase block">03. Páginas</span>
+          <select id="selPages" class="w-full bg-neutral-100 border border-black rounded-full py-2 px-4 text-xs font-mono focus:outline-none">
+            <option value="100">100 páginas</option>
+            <option value="200">200 páginas</option>
+            <option value="300">300 páginas</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="text-center pt-4">
+        <button onclick="probarSuerte()" class="bg-black text-white hover:bg-neutral-800 px-10 py-4 rounded-full font-mono text-sm tracking-widest uppercase transition-all shadow-lg hover:scale-105 flex items-center gap-3 mx-auto">
+          <i data-lucide="dices" class="w-5 h-5"></i>
+          <span>Probar suerte</span>
+        </button>
+      </div>
+
+      <div id="resultBox" class="mt-8 p-6 bg-white border border-black rounded-2xl shadow-xl hidden animate-fade-in text-center max-w-lg mx-auto">
+        <span class="font-mono text-[10px] uppercase tracking-widest bg-black text-white px-2 py-0.5">COMBINACIÓN GENERADA</span>
+        <h3 id="resultTitle" class="font-archivo text-2xl uppercase mt-3 mb-1">Cine · Paleta Negra · 200 Págs</h3>
+        <p id="resultDesc" class="text-xs text-neutral-600 font-mono">Tu diario ideal para críticas cinematográficas y bocetos visuales.</p>
+        <button onclick="applyLuckyBook()" class="mt-4 px-6 py-2 bg-black text-white rounded-full font-mono text-xs uppercase hover:bg-neutral-800">Diseñar esta versión</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 9: "DÁNOS A CONOCER" BANNER EXPANDIBLE
+  =========================================== -->
+  <section class="py-16 px-4 md:px-12 bg-black text-white border-b border-black overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+      
+      <div id="danosHeader" onclick="toggleDanosModal()" class="cursor-pointer group transition-all duration-500 text-center py-6 border-y border-white/20">
+        <h2 id="danosTitleText" class="font-archivo text-5xl sm:text-8xl lg:text-9xl tracking-tighter uppercase transition-all duration-500 group-hover:text-neutral-300">
+          Dános a conocer
+        </h2>
+        <span class="font-mono text-xs text-neutral-400 tracking-widest uppercase block mt-2">[ TOCA PARA DESPLEGAR TARJETA INFORMATIVA Y REDES ]</span>
+      </div>
+
+      <div id="danosCard" class="hidden mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-neutral-900 border border-white/20 p-6 md:p-10 rounded-lg">
+        
+        <div class="lg:col-span-7 space-y-4">
+          <span class="font-mono text-xs text-neutral-400 tracking-widest uppercase">SOBRE LA PLATAFORMA BOOK</span>
+          <h3 class="font-syne text-2xl md:text-3xl font-bold">Un espacio para registrar la vida en diarios totalmente personalizados.</h3>
+          <p class="text-xs md:text-sm text-neutral-300 leading-relaxed font-sans">
+            <strong>BOOK</strong> es una plataforma concebida para documentar tus pasiones, hábitos y proyectos. Ya sea que quieras registrar tus películas vistas, álbumes escuchados, entrenamientos o recetas culinarias, construimos cada libro diario a tu medida.
+          </p>
+        </div>
+
+        <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-white/20 pt-6 lg:pt-0 lg:pl-8 space-y-4">
+          <div class="flex items-center gap-2 font-mono text-xs text-neutral-400 uppercase">
+            <i data-lucide="share-2" class="w-4 h-4 text-white"></i>
+            <span>Compartir plataforma en redes:</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <a href="https://www.instagram.com/luizabeths.studios/" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>INSTAGRAM</span>
+              <i data-lucide="instagram" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://www.tiktok.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>TIKTOK</span>
+              <i data-lucide="video" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://www.youtube.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>YOUTUBE</span>
+              <i data-lucide="youtube" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://es.pinterest.com/luizabethsstudios/" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>PINTEREST</span>
+              <i data-lucide="bookmark" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://x.com/luizabethss" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs col-span-2">
+              <span>TWITTER / X</span>
+              <i data-lucide="twitter" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -442,7 +949,59 @@
   </div>
 
   <!-- ==========================================
-       LÓGICA JAVASCRIPT CON SUPABASE INTEGRADO
+       SECCIÓN 10: PIE DE PÁGINA (FOOTER)
+  =========================================== -->
+  <footer class="bg-black text-white py-16 px-4 md:px-12 border-t border-neutral-900">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- Izquierda: Imagen Graffiti Logo -->
+        <div class="lg:col-span-5">
+          <div class="border-b border-white/20 pb-4">
+            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&q=80&w=800" alt="BOOK Graffiti Logo" class="w-full max-w-sm h-auto object-contain">
+           <span class="text-xs font-mono text-neutral-400 block tracking-widest mt-1">LUIZABETH'S.STUDIOS</span>
+          </div>
+          <div class="font-mono text-[10px] text-neutral-500 uppercase tracking-widest mt-3">
+            GRAFFITI ZONE
+          </div>
+        </div>
+
+        <!-- Derecha: Creado por / luizabeth's.studios / Conoce más / Proyecto -->
+        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
+          
+          <div class="space-y-3">
+            <span class="text-neutral-500 uppercase tracking-widest block">CRÉDITOS Y DESARROLLO</span>
+            <p class="text-sm font-bold text-white">Creado por</p>
+            <p class="text-base text-neutral-200 font-syne font-bold">luizabeth's.studios</p>
+            
+            <div class="pt-2">
+              <span class="text-neutral-500 uppercase tracking-widest block mb-1">CONOCE MÁS</span>
+              <a href="https://clientes-chi.vercel.app" target="_blank" rel="noopener noreferrer" class="text-white underline underline-offset-4 hover:text-neutral-400 transition-colors">
+                clientes-chi.vercel.app
+              </a>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <span class="text-neutral-500 uppercase tracking-widest block">SOBRE EL PROYECTO</span>
+            <p class="text-neutral-400 leading-relaxed text-[11px] font-sans">
+              BOOK es un proyecto independiente de diseño editorial y desarrollo de productos impresos y digitales desarrollado en Venezuela. Inspirado en la identidad visual cinematográfica, busca elevar el acto cotidiano de escribir un diario a una pieza de arte coleccionable.
+            </p>
+            <div class="text-[10px] text-neutral-600 pt-4">
+              © 2026 LUIZABETH'S.STUDIOS. TODOS LOS DERECHOS RESERVADOS.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       LÓGICA JAVASCRIPT & THREE.JS & SUPABASE AUTH
   =========================================== -->
   <script>
     const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
@@ -682,9 +1241,7 @@
       window.location.reload();
     };
 
-    // Inicialización al cargar la página
     document.addEventListener('DOMContentLoaded', async function() {
-      // Verificar si hay sesión activa en Supabase
       try {
         const { data } = await supabaseClient.auth.getSession();
         if (data && data.session && data.session.user) {
@@ -736,13 +1293,13 @@
   <script>
     lucide.createIcons();
 
-    var isMenuOpen = false;
+    let isMenuOpen = false;
     function toggleMenu() {
       isMenuOpen = !isMenuOpen;
-      var sideMenu = document.getElementById('sideMenu');
-      var menuOverlay = document.getElementById('menuOverlay');
-      var line1 = document.getElementById('line1');
-      var line2 = document.getElementById('line2');
+      const sideMenu = document.getElementById('sideMenu');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const line1 = document.getElementById('line1');
+      const line2 = document.getElementById('line2');
 
       if (isMenuOpen) {
         sideMenu.classList.remove('-translate-x-full');
@@ -757,34 +1314,32 @@
       }
     }
 
-    var scene, camera, renderer, bookMesh;
-    var isDragging3D = false;
-    var previousMousePosition = { x: 0, y: 0 };
+    let scene, camera, renderer, bookMesh;
+    let isDragging3D = false;
+    let previousMousePosition = { x: 0, y: 0 };
 
     function init3D() {
-      var canvasElement = document.getElementById('threeCanvas');
-      if (!canvasElement) return;
-      var container = canvasElement.parentElement;
-      var width = container.clientWidth;
-      var height = container.clientHeight;
+      const container = document.getElementById('threeCanvas').parentElement;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
       camera.position.set(0, 0, 7);
 
-      renderer = new THREE.WebGLRenderer({ canvas: canvasElement, alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas'), alpha: true, antialias: true });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      var ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
       scene.add(ambientLight);
 
-      var dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
       dirLight.position.set(5, 5, 5);
       scene.add(dirLight);
 
-      var geometry = new THREE.BoxGeometry(2.4, 3.2, 0.5);
-      var materials = [
+      const geometry = new THREE.BoxGeometry(2.4, 3.2, 0.5);
+      const materials = [
         new THREE.MeshStandardMaterial({ color: 0x111111 }),
         new THREE.MeshStandardMaterial({ color: 0x111111 }),
         new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }),
@@ -798,10 +1353,11 @@
       bookMesh.rotation.x = 0.2;
       scene.add(bookMesh);
 
-      canvasElement.addEventListener('mousedown', function() { isDragging3D = true; });
-      canvasElement.addEventListener('mousemove', function(e) {
+      const canvasElement = document.getElementById('threeCanvas');
+      canvasElement.addEventListener('mousedown', () => { isDragging3D = true; });
+      canvasElement.addEventListener('mousemove', (e) => {
         if (isDragging3D) {
-          var deltaMove = {
+          const deltaMove = {
             x: e.offsetX - previousMousePosition.x,
             y: e.offsetY - previousMousePosition.y
           };
@@ -810,7 +1366,7 @@
         }
         previousMousePosition = { x: e.offsetX, y: e.offsetY };
       });
-      window.addEventListener('mouseup', function() { isDragging3D = false; });
+      window.addEventListener('mouseup', () => { isDragging3D = false; });
 
       window.addEventListener('resize', onWindowResize);
       animate3D();
@@ -821,15 +1377,11 @@
       if (!isDragging3D && bookMesh) {
         bookMesh.rotation.y += 0.005;
       }
-      if (renderer && scene && camera) {
-        renderer.render(scene, camera);
-      }
+      renderer.render(scene, camera);
     }
 
     function onWindowResize() {
-      var canvasElement = document.getElementById('threeCanvas');
-      if (!canvasElement) return;
-      var container = canvasElement.parentElement;
+      const container = document.getElementById('threeCanvas').parentElement;
       if (!container) return;
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
@@ -845,8 +1397,181 @@
       }
     };
 
+    /* ==========================================
+       3. CARRUSEL / SLIDER DE BANNERS CINEMÁTICOS
+    =========================================== */
+    const slidesData = [
+      { src: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=1200", title: "SCENE #01 — 500 DAYS OF SUMMER" },
+      { src: "https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&q=80&w=1200", title: "SCENE #02 — SPIDER-VERSE UNIVERSE" },
+      { src: "https://images.unsplash.com/photo-1507842229431-7e810a916790?auto=format&fit=crop&q=80&w=1200", title: "SCENE #03 — BREAKING BAD CHEMISTRY" },
+      { src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200", title: "SCENE #04 — CYBERPUNK DETROIT" },
+      { src: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1200", title: "SCENE #05 — CALL ME BY YOUR NAME" },
+      { src: "https://images.unsplash.com/photo-1517649763962-0c6232660102?auto=format&fit=crop&q=80&w=1200", title: "SCENE #06 — ATHLETE & STADIUMS" },
+      { src: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200", title: "SCENE #07 — FOOTBALL LEGENDS" },
+      { src: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=1200", title: "SCENE #08 — RESIDENT EVIL RETRO" },
+      { src: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=1200", title: "SCENE #09 — FIGHT CLUB ATMOSPHERE" },
+      { src: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200", title: "SCENE #10 — SUPER HERO ARCHIVE" },
+      { src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=1200", title: "SCENE #11 — ATMOSPHERIC VISUALS" },
+      { src: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200", title: "SCENE #12 — LUIZABETH'S STUDIOS 1" },
+      { src: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=1200", title: "SCENE #13 — STUDIO REDESIGN LOGO" },
+      { src: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=1200", title: "SCENE #14 — CINEMATIC ROMANCE" },
+      { src: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&q=80&w=1200", title: "SCENE #15 — URBAN GRAPHITI" },
+      { src: "https://images.unsplash.com/photo-1507842229431-7e810a916790?auto=format&fit=crop&q=80&w=1200", title: "SCENE #16 — EXPERIMENTAL LAB" },
+      { src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200", title: "SCENE #17 — DIGITAL DREAMS" }
+    ];
+
+    let currentSlide = 0;
+    const totalSlides = slidesData.length;
+    let slideInterval;
+
+    function initSlider() {
+      const dotsContainer = document.getElementById('slideDots');
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+
+      slidesData.forEach((slide, index) => {
+        const dot = document.createElement('button');
+        dot.className = `w-8 h-10 rounded border overflow-hidden flex-shrink-0 transition-all ${index === 0 ? 'border-white scale-105 opacity-100' : 'border-neutral-700 opacity-60 hover:opacity-100'}`;
+        dot.innerHTML = `<img src="${slide.src}" class="w-full h-full object-cover">`;
+        dot.onclick = () => {
+          goToSlide(index);
+          resetAutoSlide();
+        };
+        dotsContainer.appendChild(dot);
+      });
+
+      updateSlideView();
+      startAutoSlide();
+
+      const sliderContainer = document.getElementById('sliderContainer');
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      sliderContainer.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      sliderContainer.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+
+      function handleSwipe() {
+        if (touchEndX < touchStartX - 50) {
+          nextSlide();
+          resetAutoSlide();
+        }
+        if (touchEndX > touchStartX + 50) {
+          prevSlide();
+          resetAutoSlide();
+        }
+      }
+    }
+
+    function updateSlideView() {
+      const imgElem = document.getElementById('cinematicSlide');
+      const titleElem = document.getElementById('slideTitle');
+      const counterElem = document.getElementById('slideCounter');
+      
+      if (!imgElem) return;
+
+      imgElem.style.opacity = '0';
+      setTimeout(() => {
+        imgElem.src = slidesData[currentSlide].src;
+        titleElem.innerText = slidesData[currentSlide].title;
+        counterElem.innerText = String(currentSlide + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+        imgElem.style.opacity = '1';
+      }, 200);
+
+      const dots = document.getElementById('slideDots').children;
+      for (let i = 0; i < dots.length; i++) {
+        if (i === currentSlide) {
+          dots[i].className = 'w-8 h-10 rounded border border-white scale-105 opacity-100 flex-shrink-0 transition-all shadow';
+        } else {
+          dots[i].className = 'w-8 h-10 rounded border border-neutral-700 opacity-60 hover:opacity-100 flex-shrink-0 transition-all';
+        }
+      }
+    }
+
+    window.nextSlide = function() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateSlideView();
+    };
+
+    window.prevSlide = function() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateSlideView();
+    };
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlideView();
+    }
+
+    function startAutoSlide() {
+      slideInterval = setInterval(() => {
+        nextSlide();
+      }, 4000);
+    }
+
+    function resetAutoSlide() {
+      clearInterval(slideInterval);
+      startAutoSlide();
+    }
+
+    /* ==========================================
+       4. GENERADOR EDITORIAL "PROBAR SUERTE"
+    =========================================== */
+    window.probarSuerte = function() {
+      const collections = ["Cine", "Libros", "Música", "Juegos", "Comida", "Deportes"];
+      const colors = ["Rojo Matte", "Crema Vintage", "Paletas Verdes", "Paleta Negra", "Azul Cobalto", "Marrón Cuero"];
+      const pages = ["100 Págs", "200 Págs", "300 Págs"];
+
+      const randCol = collections[Math.floor(Math.random() * collections.length)];
+      const randColor = colors[Math.floor(Math.random() * colors.length)];
+      const randPage = pages[Math.floor(Math.random() * pages.length)];
+
+      document.getElementById('selCollection').value = randCol.toLowerCase() === 'cine' ? 'cine' : randCol.toLowerCase();
+      document.getElementById('selColor').value = randColor;
+      document.getElementById('selPages').value = randPage.split(' ')[0];
+
+      const titleElem = document.getElementById('resultTitle');
+      const descElem = document.getElementById('resultDesc');
+      const boxElem = document.getElementById('resultBox');
+
+      titleElem.innerText = randCol + " · " + randColor + " · " + randPage;
+      descElem.innerText = "Edición seleccionada por el archivo estelar. Ideal para registrar tus mejores momentos y reseñas de " + randCol.toLowerCase() + ".";
+      boxElem.classList.remove('hidden');
+    };
+
+    window.applyLuckyBook = function() {
+      alert("¡Configuración cargada en el maquetador 3D! Disfruta tu edición especial.");
+    };
+
+    /* ==========================================
+       5. BANNER EXPANDIBLE "DÁNOS A CONOCER"
+    =========================================== */
+    let isDanosOpen = false;
+    window.toggleDanosModal = function() {
+      isDanosOpen = !isDanosOpen;
+      const card = document.getElementById('danosCard');
+      const titleText = document.getElementById('danosTitleText');
+      if (isDanosOpen) {
+        card.classList.remove('hidden');
+        titleText.innerText = "¡GRACIAS POR COMPARTIR!";
+      } else {
+        card.classList.add('hidden');
+        titleText.innerText = "Dános a conocer";
+      }
+    };
+
+    window.playDemoVideo = function() {
+      alert("Cargando simulador de maquetación en vivo de Luizabeth's Studios...");
+    };
+
     window.onload = function() {
       init3D();
+      initSlider();
     };
 
     window.addEventListener('storage', function(event) {
