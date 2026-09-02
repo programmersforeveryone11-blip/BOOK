@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOK — Luizabeth's Studios</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Syne, Space Grotesk, Archivo Black & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Three.js for 3D Book canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Space Grotesk', 'monospace'],
+            syne: ['Syne', 'sans-serif'],
+            archivo: ['Archivo Black', 'sans-serif'],
+          },
+          colors: {
+            appbg: '#0a0a0a',
+            appcard: '#141414',
+            appgray: '#222222',
+            gridline: '#d1d5db',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilo de la cuadrícula técnica */
+    .bg-grid-pattern {
+      background-color: #f7f7f8;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    }
+
+    /* Ocultar barra de desplazamiento */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Marco limpio sin sombras ni filtros oscuros */
+    .clean-vibe {
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+      background-color: #0d0d0d;
+    }
+
+    /* Efecto de bordes para la caja de Info & Guía de uso */
+    .corner-bracket {
+      position: relative;
+    }
+    .corner-bracket::before {
+      content: "┌";
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+    .corner-bracket::after {
+      content: "┐";
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+    .corner-bracket-bottom::before {
+      content: "└";
+      position: absolute;
+      bottom: -6px;
+      left: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+    .corner-bracket-bottom::after {
+      content: "┘";
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      font-size: 14px;
+      line-height: 1;
+      color: #000;
+    }
+
+    /* Transición suave para menú */
+    .side-menu-drawer {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Transición suave del banner cinemático */
+    .slide-img {
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-out;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+  </style>
+</head>
+<body class="bg-[#f7f7f8] text-black font-sans antialiased selection:bg-black selection:text-white">
+
+  <!-- ==========================================
+       BARRA DE NAVEGACIÓN SUPERIOR (TOP NAVBAR)
+  =========================================== -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-black/10 px-4 md:px-8 py-3 flex items-center justify-between">
+    
+    <!-- Menú Hamburguesa (Izquierda) -->
+    <div class="flex items-center gap-4">
+      <button id="menuBtn" onclick="toggleMenu()" class="group flex flex-col justify-center items-center w-8 h-8 focus:outline-none z-50 relative" aria-label="Abrir Menú">
+        <span id="line1" class="w-6 h-[2px] bg-black transition-all duration-300 transform origin-center translate-y-[-3px]"></span>
+        <span id="line2" class="w-6 h-[2px] bg-black transition-all duration-300 transform origin-center translate-y-[3px]"></span>
+      </button>
+      <span class="text-xs font-mono tracking-widest uppercase hidden sm:inline-block">MENU</span>
+    </div>
+
+    <!-- LOGO CENTRAL -->
+    <div class="text-center">
+      <a href="#" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
+        BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
+      </a>
+    </div>
+
+    <!-- BUSCADOR, BOTÓN MI CUENTA / REGISTRO Y CARRITO (Derecha) -->
+    <div class="flex items-center gap-3 md:gap-5">
+      <div class="relative hidden sm:flex items-center">
+        <input type="text" placeholder="Buscar libros, diarios..." class="w-36 lg:w-48 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
+        <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 text-black"></i>
+      </div>
+
+      <!-- Botón dinámico de Inicio de Sesión / Perfil -->
+      <button id="navUserBtn" onclick="openAuthModal()" class="flex items-center gap-2 bg-black text-white px-3 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all">
+        <i data-lucide="user" class="w-3.5 h-3.5"></i>
+        <span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>
+      </button>
+
+      <a href="tienda.html" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+        <span class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MENÚ LATERAL (SIDE DRAWER)
+  =========================================== -->
+  <div id="sideMenu" class="fixed top-0 left-0 w-full sm:w-[380px] h-full bg-black text-white z-40 transform -translate-x-full side-menu-drawer pt-24 px-8 pb-10 flex flex-col justify-between shadow-2xl">
+    <div>
+      <div class="flex items-center justify-between border-b border-white/20 pb-4 mb-6">
+        <span class="text-xs font-mono text-neutral-400 uppercase tracking-widest">Navegación</span>
+        <button onclick="toggleMenu()" class="text-xs font-mono text-neutral-400 hover:text-white flex items-center gap-1">
+          <i data-lucide="x" class="w-4 h-4"></i> CERRAR
+        </button>
+      </div>
+
+      <nav class="space-y-4">
+        <a href="perfil.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Ajustes</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a href="perfil.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Mis libros</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Tienda</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a href="app.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>App</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a href="tienda.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Membresia</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a href="santuario.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Grafiti</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a href="comunidad.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+          <span>Comunidad-biblioteca</span>
+          <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="0" y1="10" x2="90" y2="10" />
+            <polygon points="85,4 98,10 85,16" fill="currentColor" />
+          </svg>
+        </a>
+      </nav>
+    </div>
+
+    <div class="border-t border-white/20 pt-6 mt-6 flex justify-between items-center">
+      <div>
+        <div class="text-xs font-mono text-neutral-400">BOOK</div>
+        <div class="text-[10px] text-neutral-500 mt-0.5">Libros digitales</div>
+      </div>
+      <button id="logoutBtn" onclick="logoutUser()" class="hidden text-xs font-mono text-red-400 hover:underline">
+        Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <div id="menuOverlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/60 z-30 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <!-- ==========================================
+       HERO SECTION
+  =========================================== -->
+  <section class="min-h-screen bg-grid-pattern pt-28 pb-16 px-4 md:px-12 flex flex-col justify-between relative overflow-hidden border-b border-black">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-7xl mx-auto w-full my-auto">
+      
+      <!-- IZQUIERDA: Tipografía Movie / Book + Sign In Trigger + Selector -->
+      <div class="lg:col-span-6 z-10">
+        <div class="mb-4 inline-block px-2.5 py-1 bg-black text-white text-[10px] font-mono tracking-widest uppercase">
+          Edición Especial 2026
+        </div>
+        
+        <h1 class="font-archivo text-6xl md:text-8xl lg:text-9xl tracking-tighter leading-none mb-2 select-none uppercase">
+          <span id="heroCategoryText" class="block transition-all duration-300 transform">Movie</span>
+          <span class="block ml-12 md:ml-20 text-neutral-800">Book</span>
+        </h1>
+
+        <div class="mt-6">
+          <button onclick="openAuthModal()" id="heroSignInBtn" class="group inline-flex items-center gap-3 font-mono text-sm tracking-widest uppercase text-black hover:opacity-75 transition-opacity underline underline-offset-8 decoration-1">
+            <span>Sign in / Registrarse</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+          </button>
+        </div>
+
+        <div class="mt-12">
+          <p class="text-xs font-mono text-neutral-500 mb-3 tracking-widest uppercase">Cambiar categoría de libro:</p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setCategory('movie', 'Movie', 0x1a1a1a)" class="cat-btn bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide transition-all">movie</button>
+            <button onclick="setCategory('game', 'Game', 0x3b82f6)" class="cat-btn bg-white border border-black hover:bg-black hover:text-white px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide transition-all">game</button>
+            <button onclick="setCategory('sport', 'Sport', 0x10b981)" class="cat-btn bg-white border border-black hover:bg-black hover:text-white px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide transition-all">sport</button>
+            <button onclick="setCategory('music', 'Music', 0x8b5cf6)" class="cat-btn bg-white border border-black hover:bg-black hover:text-white px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide transition-all">music</button>
+            <button onclick="setCategory('food', 'Food', 0xf59e0b)" class="cat-btn bg-white border border-black hover:bg-black hover:text-white px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide transition-all">food</button>
+            <button onclick="setCategory('books', 'Books', 0xef4444)" class="cat-btn bg-white border border-black hover:bg-black hover:text-white px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide transition-all">books</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DERECHA: LIBRO INTERACTIVO 3D (THREE.JS) -->
+      <div class="lg:col-span-6 relative flex flex-col items-center justify-center">
+        <div class="w-full h-[360px] md:h-[450px] relative rounded-lg border border-black/20 bg-white/50 backdrop-blur-sm shadow-xl overflow-hidden cursor-grab active:cursor-grabbing">
+          <canvas id="threeCanvas" class="w-full h-full"></canvas>
+          
+          <div class="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] font-mono text-neutral-500 pointer-events-none">
+            <span>[ ARRASTRA PARA ROTAR EL LIBRO 3D ]</span>
+            <span id="bookLabel">CUBIERTA: MOVIE DIARY 2026</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="max-w-7xl mx-auto w-full pt-8 flex justify-between items-center text-xs font-mono text-neutral-500 border-t border-black/10">
+      <span>FIG. 01 — ARCHIVO EDITORIAL</span>
+      <span>LUIZABETH'S.STUDIOS © 2026</span>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 2: LIBRO DESTACADO + INFO & GUÍA DE USO
+  =========================================== -->
+  <section class="py-16 px-4 md:px-12 bg-white border-b border-black">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <div class="lg:col-span-8 flex flex-col md:flex-row gap-8 items-center">
+          <div class="w-full md:w-1/2 aspect-[3/4] bg-neutral-900 rounded-sm relative overflow-hidden shadow-2xl group">
+            <img src="amor.webp" alt="Diario de Cine y Amor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            <div class="absolute bottom-4 left-4 right-4 text-white font-mono text-xs">
+              <span class="bg-white text-black px-2 py-0.5 font-bold">Novedad</span>
+              <p class="mt-2 text-sm font-bold">Diario de Rodaje & Cinefilia</p>
+            </div>
+          </div>
+
+          <div class="w-full md:w-1/2 space-y-4">
+            <span class="text-xs font-mono tracking-widest text-neutral-500 uppercase">Serie Limitada</span>
+            <h2 class="text-2xl font-bold font-syne tracking-tight">Bitácora Personalizada para Historias, Guiones e Ideas.</h2>
+            <p class="text-sm text-neutral-600 leading-relaxed">
+              Diseñado en papel grueso de 120g con tapa dura mate. Espacio estructurado para registrar cada película, concepto visual, listas de producción y reflexiones diarias.
+            </p>
+
+            <div class="pt-4">
+              <a href="coleccion.html" class="group inline-flex items-center gap-4 text-base font-bold uppercase tracking-wider hover:opacity-75 transition-opacity">
+                <svg class="w-16 h-5 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="0" y1="10" x2="88" y2="10" />
+                  <polygon points="82,3 98,10 82,17" fill="currentColor" />
+                </svg>
+                <span>Mirar libros</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 flex justify-end">
+          <div class="border border-black p-6 bg-[#f9f9f9] max-w-sm w-full relative corner-bracket corner-bracket-bottom">
+            <div class="flex items-center justify-between border-b border-black/20 pb-3 mb-3">
+              <span class="font-mono text-xs font-bold uppercase tracking-widest">INFO E GUÍA DE USO</span>
+              <i data-lucide="compass" class="w-4 h-4"></i>
+            </div>
+            <ul class="text-xs space-y-2.5 font-mono text-neutral-700">
+              <li class="flex items-start gap-2">
+                <span class="font-bold">01.</span>
+                <span>Selecciona la plantilla de contenido según tu hábito creativo.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold">02.</span>
+                <span>Personaliza la paleta de color exterior y número de páginas.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold">03.</span>
+                <span>Publica digitalmente en la biblioteca comunitaria o recibe tu ejemplar impreso.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 3: BANNERS EN CAMBIO CONSTANTE
+  =========================================== -->
+  <section class="bg-neutral-950 py-12 border-b border-black overflow-hidden relative select-none">
+    <div class="max-w-7xl mx-auto px-4">
+      
+      <div class="text-xs font-mono text-neutral-300 mb-4 uppercase tracking-widest flex items-center justify-between flex-wrap gap-2">
+        <span class="flex items-center gap-2">
+          <i data-lucide="film" class="w-4 h-4 text-white"></i>
+          VISUAL ATMOSPHERE / BANNERS EN CAMBIO CONSTANTE (17 ESCENAS)
+        </span>
+        <div class="flex items-center gap-4">
+          <span id="slideCounter" class="font-mono text-[11px] text-neutral-400">01 / 17</span>
+          <span class="animate-pulse flex items-center gap-1 font-bold text-red-500">
+            <span class="w-2 h-2 rounded-full bg-red-600 inline-block"></span> EN VIVO
+          </span>
+        </div>
+      </div>
+
+      <div id="sliderContainer" class="relative w-full h-[380px] sm:h-[540px] md:h-[620px] rounded-lg overflow-hidden border border-neutral-800 clean-vibe cursor-grab active:cursor-grabbing touch-pan-y flex items-center justify-center bg-black">
+        
+        <img id="cinematicSlide" 
+             src="amor.webp" 
+             alt="Visual Banner Atmosphere" 
+             class="slide-img w-full h-full object-contain max-h-full transition-all duration-500">
+        
+        <div class="absolute top-4 left-4 z-10 font-mono text-xs text-white bg-black/85 px-3.5 py-2 rounded-md border border-white/20 flex items-center gap-2 pointer-events-none shadow-lg">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
+          <span id="slideTitle" class="tracking-wide font-medium">SCENE #01 — 500 DAYS OF SUMMER</span>
+        </div>
+
+        <div class="absolute bottom-4 left-4 right-20 sm:right-32 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 z-10 pointer-events-auto" id="slideDots">
+        </div>
+        
+        <div class="absolute bottom-4 right-4 flex items-center gap-2 z-20">
+          <button onclick="prevSlide()" class="w-10 h-10 bg-white/90 hover:bg-white text-black rounded-full border border-black/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg" aria-label="Anterior">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button onclick="nextSlide()" class="w-10 h-10 bg-white/90 hover:bg-white text-black rounded-full border border-black/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg" aria-label="Siguiente">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="absolute top-4 right-4 hidden md:flex items-center gap-1.5 font-mono text-[10px] text-neutral-300 bg-black/80 px-2.5 py-1 rounded border border-white/10 pointer-events-none z-10">
+          <i data-lucide="move-horizontal" class="w-3.5 h-3.5"></i>
+          <span>DESLIZA CON EL TOUCH / RATÓN</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 4: COLECCIÓN
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-[#f7f7f8] border-b border-black">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="mb-12">
+        <h2 class="font-archivo text-6xl sm:text-8xl lg:text-9xl uppercase tracking-tighter text-black">
+          Colección
+        </h2>
+        <p class="font-mono text-xs text-neutral-500 tracking-widest uppercase -mt-2">Catálogo Oficial de Series Limitadas</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-y border-black divide-y sm:divide-y-0 sm:divide-x divide-black bg-white">
+        
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">1 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="kill bill.webp" alt="Coleccion Kill Bill" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 01</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Kill Bill Action Journal</h3>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">2 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="bb.webp" alt="Coleccion Breaking Bad" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 02</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Chemistry Chronicles</h3>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">3 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="jfnf.webp" alt="Coleccion Call Me By Your Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 03</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Cinema Romance</h3>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
+          <div class="font-archivo text-3xl mb-4">4 —</div>
+          <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
+            <img src="jobe bellingham.webp" alt="Coleccion Sports Journal" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div>
+            <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 04</span>
+            <h3 class="font-bold text-lg leading-tight mt-1">Athlete & Sports Diary</h3>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <a href="coleccion.html" class="group inline-flex items-center gap-4 text-sm md:text-base font-bold uppercase tracking-widest hover:opacity-75 transition-opacity">
+          <span>Ve más colecciones de libros</span>
+          <svg class="w-16 h-5 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="0" y1="10" x2="88" y2="10" />
+            <polygon points="82,3 98,10 82,17" fill="currentColor" />
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 5: CREADO POR LUIZABETH'S.STUDIOS
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-white border-b border-black">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="mb-12 border-b border-black pb-6">
+        <h2 class="font-archivo text-5xl md:text-7xl lg:text-8xl tracking-tighter uppercase">
+          Creado por
+        </h2>
+        <span class="font-syne text-2xl md:text-4xl text-neutral-700 tracking-tight block mt-1">
+          luizabeth's.studios
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        
+        <div class="lg:col-span-4 space-y-4">
+          <div class="inline-block px-2 py-0.5 bg-neutral-200 text-neutral-800 font-mono text-[10px] font-bold uppercase">
+            Estudio Venezolano DE DISEÑO
+          </div>
+          <h3 class="font-bold text-xl font-syne">Pasión por la editorialidad, el objeto físico y la memoria visual.</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            Fundada en Venezuela, <strong>luizabeth's.studios</strong> nace de la búsqueda de fusionar el minimalismo cinematográfico con herramientas de registro personal. Diseñamos diarios, libros de arte y experiencias digitales para creativos globales.
+          </p>
+          <div class="pt-2 font-mono text-xs text-neutral-500">
+            Caracas / Valencia, Venezuela — 2026
+          </div>
+        </div>
+
+        <div class="lg:col-span-5">
+          <div class="aspect-[4/3] bg-neutral-900 border border-black overflow-hidden relative shadow-xl">
+            <img src="Rediseño de logo(1).png" alt="Luizabeths Studios Workspace" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
+            <div class="absolute bottom-3 left-3 bg-black text-white font-mono text-[10px] px-2 py-1">
+              STUDIO ARCHIVE / VOL. 1
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col justify-center space-y-3">
+          <span class="font-mono text-xs text-neutral-500 uppercase tracking-widest mb-1">Compartir estudio:</span>
+          
+          <a href="https://www.instagram.com/luizabeths.studios/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">INSTAGRAM</span>
+            <i data-lucide="instagram" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://www.tiktok.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">TIKTOK</span>
+            <i data-lucide="video" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://www.youtube.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">YOUTUBE</span>
+            <i data-lucide="youtube" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://es.pinterest.com/luizabethsstudios/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">PINTEREST</span>
+            <i data-lucide="bookmark" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+
+          <a href="https://x.com/luizabethss" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 border border-black hover:bg-black hover:text-white transition-colors flex items-center justify-between font-mono text-xs group">
+            <span class="font-bold">TWITTER / X</span>
+            <i data-lucide="twitter" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 6: LIBROS DE LA COMUNIDAD
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-neutral-200 border-b border-black" id="comunidad">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/30 pb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-widest text-neutral-600 block mb-1">BIBLIOTECA ABIERTA</span>
+          <h2 class="font-archivo text-4xl sm:text-6xl uppercase tracking-tight text-black">
+            Libros de la comunidad
+          </h2>
+        </div>
+        <p class="font-mono text-xs text-neutral-600 max-w-xs">
+          Publicaciones creadas y compartidas por nuestra red mundial de lectores y autores.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="ara.webp" alt="Diario de Sombras" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">320 págs</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base font-syne">Cinema Meme & Cinema Spidey</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="super.webp" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@valeria_cine</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="coono.gif" alt="Bitacora Gamer" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">180 págs</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base font-syne">Detroit: Become Human & Cyber Journal</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="leon.webp" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@connor_rk800</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="jude bellingham😍😍.webp" alt="Bitacora Deportes" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">250 págs</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base font-syne">Football Diaries & Jude Stars</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="jobe bellingham.webp" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@bellingham_fan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
+          <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
+            <img src="uhdu.webp" alt="Logbook Atmosferico" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">200 págs</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base font-syne">Logbook de Fotografía & Escenas</h3>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+              <img src="pelea.webp" class="w-6 h-6 rounded-full object-cover border border-black">
+              <span class="font-mono text-xs text-neutral-700">@retro_dev</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <a href="comunidad.html" class="group inline-flex items-center gap-3 font-mono text-sm font-bold uppercase tracking-widest text-black">
+          <span>Ver más</span>
+          <i data-lucide="arrow-right" class="w-5 h-5 transform group-hover:translate-x-2 transition-transform"></i>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 8: BUSCA TU PRÓXIMO BOOK IDEA
+  =========================================== -->
+  <section class="py-20 px-4 md:px-12 bg-[#f7f7f8] border-b border-black">
+    <div class="max-w-5xl mx-auto">
+      
+      <div class="max-w-2xl mb-10">
+        <span class="font-mono text-xs text-neutral-500 uppercase tracking-widest block mb-2">GENERADOR EDITORIAL</span>
+        <h2 class="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight leading-none text-black">
+          Busca tu próximo BOOK idea o deja que el destino lo elija
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <div class="bg-white p-5 border border-black rounded-3xl shadow-sm space-y-2">
+          <span class="font-mono text-xs text-neutral-500 uppercase block">01. Colección</span>
+          <select id="selCollection" class="w-full bg-neutral-100 border border-black rounded-full py-2 px-4 text-xs font-mono focus:outline-none">
+            <option value="cine">Cine</option>
+            <option value="libros">Libros</option>
+            <option value="música">Música</option>
+            <option value="juegos">Juegos</option>
+            <option value="comida">Comida</option>
+            <option value="deportes">Deportes</option>
+          </select>
+        </div>
+
+        <div class="bg-white p-5 border border-black rounded-3xl shadow-sm space-y-2">
+          <span class="font-mono text-xs text-neutral-500 uppercase block">02. Color</span>
+          <select id="selColor" class="w-full bg-neutral-100 border border-black rounded-full py-2 px-4 text-xs font-mono focus:outline-none">
+            <option value="Rojo Matte">Rojo</option>
+            <option value="Crema Vintage">Crema</option>
+            <option value="Paletas Verdes">Paletas verdes</option>
+            <option value="Paleta Negra">Paleta negra</option>
+            <option value="Azul Cobalto">Azul</option>
+            <option value="Marrón Cuero">Marrón</option>
+          </select>
+        </div>
+
+        <div class="bg-white p-5 border border-black rounded-3xl shadow-sm space-y-2">
+          <span class="font-mono text-xs text-neutral-500 uppercase block">03. Páginas</span>
+          <select id="selPages" class="w-full bg-neutral-100 border border-black rounded-full py-2 px-4 text-xs font-mono focus:outline-none">
+            <option value="100">100 páginas</option>
+            <option value="200">200 páginas</option>
+            <option value="300">300 páginas</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="text-center pt-4">
+        <button onclick="probarSuerte()" class="bg-black text-white hover:bg-neutral-800 px-10 py-4 rounded-full font-mono text-sm tracking-widest uppercase transition-all shadow-lg hover:scale-105 flex items-center gap-3 mx-auto">
+          <i data-lucide="dices" class="w-5 h-5"></i>
+          <span>Probar suerte</span>
+        </button>
+      </div>
+
+      <div id="resultBox" class="mt-8 p-6 bg-white border border-black rounded-2xl shadow-xl hidden text-center max-w-lg mx-auto">
+        <span class="font-mono text-[10px] uppercase tracking-widest bg-black text-white px-2 py-0.5">COMBINACIÓN GENERADA</span>
+        <h3 id="resultTitle" class="font-archivo text-2xl uppercase mt-3 mb-1">Cine · Paleta Negra · 200 Págs</h3>
+        <p id="resultDesc" class="text-xs text-neutral-600 font-mono">Tu diario ideal para críticas cinematográficas y bocetos visuales.</p>
+        <button onclick="applyLuckyBook()" class="mt-4 px-6 py-2 bg-black text-white rounded-full font-mono text-xs uppercase hover:bg-neutral-800">Diseñar esta versión</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN 9: "DÁNOS A CONOCER" BANNER EXPANDIBLE
+  =========================================== -->
+  <section class="py-16 px-4 md:px-12 bg-black text-white border-b border-black overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+      
+      <div id="danosHeader" onclick="toggleDanosModal()" class="cursor-pointer group transition-all duration-500 text-center py-6 border-y border-white/20">
+        <h2 id="danosTitleText" class="font-archivo text-5xl sm:text-8xl lg:text-9xl tracking-tighter uppercase transition-all duration-500 group-hover:text-neutral-300">
+          Dános a conocer
+        </h2>
+        <span class="font-mono text-xs text-neutral-400 tracking-widest uppercase block mt-2">[ TOCA PARA DESPLEGAR TARJETA INFORMATIVA Y REDES ]</span>
+      </div>
+
+      <div id="danosCard" class="hidden mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-neutral-900 border border-white/20 p-6 md:p-10 rounded-lg">
+        
+        <div class="lg:col-span-7 space-y-4">
+          <span class="font-mono text-xs text-neutral-400 tracking-widest uppercase">SOBRE LA PLATAFORMA BOOK</span>
+          <h3 class="font-syne text-2xl md:text-3xl font-bold">Un espacio para registrar la vida en diarios totalmente personalizados.</h3>
+          <p class="text-xs md:text-sm text-neutral-300 leading-relaxed font-sans">
+            <strong>BOOK</strong> es una plataforma concebida para documentar tus pasiones, hábitos y proyectos. Ya sea que quieras registrar tus películas vistas, álbumes escuchados, entrenamientos o recetas culinarias, construimos cada libro diario a tu medida.
+          </p>
+        </div>
+
+        <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-white/20 pt-6 lg:pt-0 lg:pl-8 space-y-4">
+          <div class="flex items-center gap-2 font-mono text-xs text-neutral-400 uppercase">
+            <i data-lucide="share-2" class="w-4 h-4 text-white"></i>
+            <span>Compartir plataforma en redes:</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <a href="https://www.instagram.com/luizabeths.studios/" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>INSTAGRAM</span>
+              <i data-lucide="instagram" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://www.tiktok.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>TIKTOK</span>
+              <i data-lucide="video" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://www.youtube.com/@luizabeths_studios" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>YOUTUBE</span>
+              <i data-lucide="youtube" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://es.pinterest.com/luizabethsstudios/" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs">
+              <span>PINTEREST</span>
+              <i data-lucide="bookmark" class="w-4 h-4"></i>
+            </a>
+
+            <a href="https://x.com/luizabethss" target="_blank" rel="noopener noreferrer" class="p-2.5 bg-neutral-800 hover:bg-white hover:text-black transition-colors border border-white/10 rounded flex items-center justify-between font-mono text-xs col-span-2">
+              <span>TWITTER / X</span>
+              <i data-lucide="twitter" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PIE DE PÁGINA (FOOTER)
+  =========================================== -->
+  <footer class="bg-black text-white py-16 px-4 md:px-12 border-t border-neutral-900">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <div class="lg:col-span-5">
+          <div class="border-b border-white/20 pb-4">
+            <img src="huhu.jpg" alt="BOOK Graffiti Logo" class="w-full max-w-sm h-auto object-contain">
+            <span class="text-xs font-mono text-neutral-400 block tracking-widest mt-1">X LUIZABETH'S.STUDIOS</span>
+          </div>
+          <div class="font-mono text-[10px] text-neutral-500 uppercase tracking-widest mt-3">
+            GRAFFITI ZONE
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
+          
+          <div class="space-y-3">
+            <span class="text-neutral-500 uppercase tracking-widest block">CRÉDITOS Y DESARROLLO</span>
+            <p class="text-sm font-bold text-white">Creado por</p>
+            <p class="text-base text-neutral-200 font-syne font-bold">luizabeth's.studios</p>
+            
+            <div class="pt-2">
+              <span class="text-neutral-500 uppercase tracking-widest block mb-1">CONOCE MÁS</span>
+              <a href="https://clientes-chi.vercel.app" target="_blank" rel="noopener noreferrer" class="text-white underline underline-offset-4 hover:text-neutral-400 transition-colors">
+                clientes-chi.vercel.app
+              </a>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <span class="text-neutral-500 uppercase tracking-widest block">SOBRE EL PROYECTO</span>
+            <p class="text-neutral-400 leading-relaxed text-[11px] font-sans">
+              BOOK es un proyecto independiente de diseño editorial y desarrollo de productos impresos y digitales desarrollado en Venezuela. Inspirado en la identidad visual cinematográfica, busca elevar el acto cotidiano de escribir un diario a una pieza de arte coleccionable.
+            </p>
+            <div class="text-[10px] text-neutral-600 pt-4">
+              © 2026 LUIZABETH'S.STUDIOS. TODOS LOS DERECHOS RESERVADOS.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODAL INTERACTIVO DE AUTENTICACIÓN / REGISTRO / INICIO DE SESIÓN
+  ========================================================================= -->
+  <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl border border-black shadow-2xl overflow-hidden relative font-sans animate-fade-in">
+      
+      <!-- Botón de Cerrar Modal -->
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-black p-1 rounded-full transition-colors z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Encabezado del Modal -->
+      <div class="p-6 bg-neutral-900 text-white border-b border-neutral-800">
+        <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 block mb-1">ACCESO USUARIO — BOOK</span>
+        <h3 class="font-archivo text-2xl tracking-tight uppercase" id="authModalTitle">Mi Cuenta</h3>
+        <p class="text-xs text-neutral-400 font-mono mt-1">Guarda tus diarios y publicaciones personalizadas.</p>
+      </div>
+
+      <!-- Pestañas (Tabs) -->
+      <div class="flex border-b border-black/10 font-mono text-xs bg-neutral-100">
+        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-3 font-bold border-b-2 border-black text-black bg-white transition-all">
+          INICIAR SESIÓN
+        </button>
+        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-3 font-bold text-neutral-500 border-b-2 border-transparent hover:text-black transition-all">
+          CREAR CUENTA
+        </button>
+      </div>
+
+      <!-- Mensaje de Notificación / Error -->
+      <div id="authAlert" class="hidden px-6 pt-4">
+        <div id="authAlertText" class="p-3 text-xs font-mono rounded bg-red-100 border border-red-400 text-red-700"></div>
+      </div>
+
+      <div class="p-6">
+        
+        <!-- ================= FORMULARIO INICIO DE SESIÓN ================= -->
+        <form id="formLogin" onsubmit="event.preventDefault(); loginWithEmail();" class="space-y-4">
+          <div>
+            <label class="block font-mono text-[11px] uppercase tracking-wider text-neutral-600 mb-1">Correo Electrónico</label>
+            <input type="email" id="loginEmail" required placeholder="tu@email.com" class="w-full px-3.5 py-2.5 border border-black/30 rounded-lg text-sm font-mono focus:outline-none focus:border-black transition-colors">
+          </div>
+
+          <div>
+            <label class="block font-mono text-[11px] uppercase tracking-wider text-neutral-600 mb-1">Contraseña</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-black/30 rounded-lg text-sm font-mono focus:outline-none focus:border-black transition-colors">
+          </div>
+
+          <button type="submit" id="loginSubmitBtn" class="w-full py-3 bg-black text-white font-mono text-xs uppercase tracking-widest rounded-lg hover:bg-neutral-800 transition-colors shadow">
+            Entrar a mi espacio
+          </button>
+        </form>
+
+        <!-- ================= FORMULARIO REGISTRO COMPLETO ================= -->
+        <form id="formRegister" onsubmit="event.preventDefault(); registerUser();" class="space-y-3 hidden">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Nombre *</label>
+              <input type="text" id="regName" required placeholder="Luizabeth" class="w-full px-3 py-2 border border-black/30 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
+            </div>
+            <div>
+              <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Apellido</label>
+              <input type="text" id="regLastName" placeholder="Pérez" class="w-full px-3 py-2 border border-black/30 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Edad</label>
+              <input type="number" id="regAge" min="10" max="120" placeholder="22" class="w-full px-3 py-2 border border-black/30 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
+            </div>
+            <div>
+              <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Categoría favorita</label>
+              <select id="regTaste" class="w-full px-2 py-2 border border-black/30 rounded-lg text-xs font-mono bg-white focus:outline-none focus:border-black">
+                <option value="movie">Cine / Movies</option>
+                <option value="game">Videojuegos</option>
+                <option value="sport">Deportes</option>
+                <option value="music">Música</option>
+                <option value="food">Cocina / Comida</option>
+                <option value="books">Libros & Arte</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Correo Electrónico *</label>
+            <input type="email" id="regEmail" required placeholder="creativo@estudio.com" class="w-full px-3 py-2 border border-black/30 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Contraseña (Mínimo 6 caracteres) *</label>
+            <input type="password" id="regPassword" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 border border-black/30 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-mono text-[10px] uppercase tracking-wider text-neutral-600 mb-1">Foto de Perfil (Opcional)</label>
+            <input type="file" id="regAvatar" accept="image/*" class="w-full text-[11px] font-mono text-neutral-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-mono file:bg-neutral-200 file:text-black hover:file:bg-black hover:file:text-white file:transition-colors">
+          </div>
+
+          <button type="submit" id="regSubmitBtn" class="w-full py-3 bg-black text-white font-mono text-xs uppercase tracking-widest rounded-lg hover:bg-neutral-800 transition-colors shadow mt-2">
+            Completar Registro
+          </button>
+        </form>
+
+        <!-- SEPARADOR -->
+        <div class="relative my-4 flex items-center justify-center">
+          <div class="border-t border-black/10 w-full"></div>
+          <span class="bg-white px-2 font-mono text-[10px] text-neutral-400 uppercase tracking-widest absolute">O ACCEDE CON</span>
+        </div>
+
+        <!-- BOTÓN GOOGLE -->
+        <button type="button" onclick="loginWithGoogle()" class="w-full py-2.5 px-4 border border-black/30 rounded-lg hover:bg-neutral-50 flex items-center justify-center gap-3 font-mono text-xs transition-colors shadow-sm">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Continuar con Google</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       LÓGICA JAVASCRIPT PRINCIPAL + FIREBASE AUTH SDK
+  =========================================== -->
+  <script type="module">
+    // Importar Firebase v10/v11 desde Google CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { 
+      getAuth, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // Configuracion de tu proyecto Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6SBavtGM63_OJI2tDnPB8nlhQV7Va55c",
+      authDomain: "book-8cd5c.firebaseapp.com",
+      projectId: "book-8cd5c",
+      storageBucket: "book-8cd5c.firebasestorage.app",
+      messagingSenderId: "136955954326",
+      appId: "1:136955954326:web:b4944427d1f2be883baeb7",
+      measurementId: "G-SZB7BDEVVL"
+    };
+
+    // Inicializar SDKs
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    /* ==========================================
+       MANEJO DEL MODAL Y CONTROLADOR DE SESIÓN
+    =========================================== */
+    function showAlert(msg, isError = true) {
+      const alertBox = document.getElementById('authAlert');
+      const alertText = document.getElementById('authAlertText');
+      alertBox.classList.remove('hidden');
+      alertText.innerText = msg;
+      if (isError) {
+        alertText.className = "p-3 text-xs font-mono rounded bg-red-100 border border-red-400 text-red-700";
+      } else {
+        alertText.className = "p-3 text-xs font-mono rounded bg-emerald-100 border border-emerald-400 text-emerald-800";
+      }
+    }
+
+    function clearAlert() {
+      document.getElementById('authAlert').classList.add('hidden');
+    }
+
+    window.openAuthModal = () => {
+      clearAlert();
+      document.getElementById('authModal').classList.remove('hidden');
+    };
+
+    window.closeAuthModal = () => {
+      document.getElementById('authModal').classList.add('hidden');
+    };
+
+    window.switchAuthTab = (tab) => {
+      clearAlert();
+      const isLogin = tab === 'login';
+      document.getElementById('formLogin').classList.toggle('hidden', !isLogin);
+      document.getElementById('formRegister').classList.toggle('hidden', isLogin);
+      
+      const tabLoginBtn = document.getElementById('tabLoginBtn');
+      const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+
+      if (isLogin) {
+        tabLoginBtn.className = 'flex-1 py-3 font-bold border-b-2 border-black text-black bg-white transition-all';
+        tabRegisterBtn.className = 'flex-1 py-3 font-bold text-neutral-500 border-b-2 border-transparent hover:text-black transition-all';
+      } else {
+        tabRegisterBtn.className = 'flex-1 py-3 font-bold border-b-2 border-black text-black bg-white transition-all';
+        tabLoginBtn.className = 'flex-1 py-3 font-bold text-neutral-500 border-b-2 border-transparent hover:text-black transition-all';
+      }
+    };
+
+    /* ==========================================
+       REGISTRO CON EMAIL, FIREBASE STORE & STORAGE
+    =========================================== */
+    window.registerUser = async () => {
+      clearAlert();
+      const name = document.getElementById('regName').value.trim();
+      const lastName = document.getElementById('regLastName').value.trim();
+      const age = document.getElementById('regAge').value;
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const taste = document.getElementById('regTaste').value;
+      const avatarFile = document.getElementById('regAvatar').files[0];
+      const submitBtn = document.getElementById('regSubmitBtn');
+
+      if (!email || !password || !name) {
+        showAlert("Por favor completa los campos requeridos con asterisco (*).");
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert("La contraseña debe contener al menos 6 caracteres.");
+        return;
+      }
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "PROCESANDO REGISTRO...";
+
+        // 1. Crear usuario en Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        let photoURL = "";
+
+        // 2. Subir Foto de Perfil si el usuario seleccionó una
+        if (avatarFile) {
+          try {
+            const storageRef = ref(storage, `avatars/${user.uid}_${avatarFile.name}`);
+            await uploadBytes(storageRef, avatarFile);
+            photoURL = await getDownloadURL(storageRef);
+          } catch (storageErr) {
+            console.warn("Storage warning:", storageErr);
+          }
+        }
+
+        // 3. Crear documento de Perfil en Firestore DB
+        try {
+          await setDoc(doc(db, "users", user.uid), {
+            nombre: name,
+            apellido: lastName,
+            edad: age ? Number(age) : null,
+            email: email,
+            gustos: taste,
+            fotoPerfil: photoURL,
+            creadoEn: new Date().toISOString()
+          });
+        } catch (dbErr) {
+          console.warn("Firestore save warning:", dbErr);
+        }
+
+        showAlert("¡Cuenta creada con éxito! Redirigiendo...", false);
+        setTimeout(() => {
+          window.closeAuthModal();
+        }, 1200);
+
+      } catch (error) {
+        console.error("Register Error:", error);
+        let errorMsg = "Error en el registro: " + error.message;
+        if (error.code === 'auth/email-already-in-use') {
+          errorMsg = "Este correo electrónico ya está registrado.";
+        } else if (error.code === 'auth/invalid-email') {
+          errorMsg = "El correo ingresado no es válido.";
+        }
+        showAlert(errorMsg);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Completar Registro";
+      }
+    };
+
+    /* ==========================================
+       INICIO DE SESIÓN EMAIL
+    =========================================== */
+    window.loginWithEmail = async () => {
+      clearAlert();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const submitBtn = document.getElementById('loginSubmitBtn');
+
+      if (!email || !password) {
+        showAlert("Ingresa tu correo y contraseña.");
+        return;
+      }
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "INICIANDO SESIÓN...";
+        await signInWithEmailAndPassword(auth, email, password);
+        showAlert("¡Bienvenido de nuevo!", false);
+        setTimeout(() => window.closeAuthModal(), 1000);
+      } catch (error) {
+        console.error("Login Error:", error);
+        let errorMsg = "Error al entrar: Credenciales incorrectas.";
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+          errorMsg = "Correo o contraseña incorrectos.";
+        }
+        showAlert(errorMsg);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Entrar a mi espacio";
+      }
+    };
+
+    /* ==========================================
+       INICIO DE SESIÓN CON GOOGLE
+    =========================================== */
+    window.loginWithGoogle = async () => {
+      clearAlert();
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        const userRef = doc(db, "users", user.uid);
+        try {
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) {
+            await setDoc(userRef, {
+              nombre: user.displayName ? user.displayName.split(' ')[0] : 'Usuario',
+              apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
+              email: user.email,
+              fotoPerfil: user.photoURL || '',
+              gustos: 'movie',
+              creadoEn: new Date().toISOString()
+            });
+          }
+        } catch (dbErr) {
+          console.warn("Google Firestore warning:", dbErr);
+        }
+
+        showAlert("¡Sesión iniciada con Google!", false);
+        setTimeout(() => window.closeAuthModal(), 1000);
+      } catch (error) {
+        console.error("Google Auth Error:", error);
+        showAlert("Error con Google: " + error.message);
+      }
+    };
+
+    /* ==========================================
+       CERRAR SESIÓN
+    =========================================== */
+    window.logoutUser = async () => {
+      try {
+        await signOut(auth);
+        alert("Sesión cerrada");
+      } catch (err) {
+        console.error("Signout error:", err);
+      }
+    };
+
+    /* ==========================================
+       OBSERVADOR DEL ESTADO DE AUTENTICACIÓN
+    =========================================== */
+    onAuthStateChanged(auth, async (user) => {
+      const navUserLabel = document.getElementById('navUserLabel');
+      const navUserBtn = document.getElementById('navUserBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const heroSignInBtn = document.getElementById('heroSignInBtn');
+
+      if (user) {
+        let userName = user.displayName || user.email.split('@')[0];
+        let userPhoto = user.photoURL;
+
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            if (data.nombre) userName = data.nombre;
+            if (data.fotoPerfil) userPhoto = data.fotoPerfil;
+          }
+        } catch (e) {
+          console.log("Firestore state lookup:", e);
+        }
+
+        if (navUserLabel) navUserLabel.innerText = userName.toUpperCase();
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+
+        if (navUserBtn) {
+          navUserBtn.onclick = () => window.location.href = "perfil.html";
+          if (userPhoto) {
+            navUserBtn.innerHTML = `
+              <img src="${userPhoto}" class="w-4 h-4 rounded-full object-cover border border-white">
+              <span class="uppercase tracking-wider font-mono text-xs">${userName}</span>
+            `;
+          }
+        }
+
+        if (heroSignInBtn) {
+          heroSignInBtn.innerHTML = `<span>Hola, ${userName} (Ir a Perfil)</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+          heroSignInBtn.onclick = () => window.location.href = "perfil.html";
+        }
+      } else {
+        if (navUserLabel) navUserLabel.innerText = "ENTRAR";
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (navUserBtn) {
+          navUserBtn.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>`;
+          navUserBtn.onclick = () => openAuthModal();
+        }
+        if (heroSignInBtn) {
+          heroSignInBtn.innerHTML = `<span>Sign in / Registrarse</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+          heroSignInBtn.onclick = () => openAuthModal();
+        }
+      }
+      lucide.createIcons();
+    });
+  </script>
+
+  <!-- ==========================================
+       LÓGICA GENERAL DE LA INTERFAZ Y THREE.JS
+  =========================================== -->
+  <script>
+    lucide.createIcons();
+
+    /* 1. MENÚ LATERAL */
+    let isMenuOpen = false;
+    function toggleMenu() {
+      isMenuOpen = !isMenuOpen;
+      const sideMenu = document.getElementById('sideMenu');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const line1 = document.getElementById('line1');
+      const line2 = document.getElementById('line2');
+
+      if (isMenuOpen) {
+        sideMenu.classList.remove('-translate-x-full');
+        menuOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        line1.classList.add('rotate-45', 'translate-y-[0px]');
+        line2.classList.add('-rotate-45', 'translate-y-[0px]');
+      } else {
+        sideMenu.classList.add('-translate-x-full');
+        menuOverlay.classList.add('opacity-0', 'pointer-events-none');
+        line1.classList.remove('rotate-45', 'translate-y-[0px]');
+        line2.classList.remove('-rotate-45', 'translate-y-[0px]');
+      }
+    }
+
+    /* 2. LIBRO INTERACTIVO 3D */
+    let scene, camera, renderer, bookMesh;
+    let isDragging3D = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    function init3D() {
+      const container = document.getElementById('threeCanvas').parentElement;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 7);
+
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas'), alpha: true, antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      dirLight.position.set(5, 5, 5);
+      scene.add(dirLight);
+
+      const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      backLight.position.set(-5, -5, -5);
+      scene.add(backLight);
+
+      const geometry = new THREE.BoxGeometry(2.4, 3.2, 0.5);
+      
+      const materials = [
+        new THREE.MeshStandardMaterial({ color: 0x111111 }),
+        new THREE.MeshStandardMaterial({ color: 0x111111 }),
+        new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }),
+        new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }),
+        new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.2 }),
+        new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.2 })
+      ];
+
+      bookMesh = new THREE.Mesh(geometry, materials);
+      bookMesh.rotation.y = -0.5;
+      bookMesh.rotation.x = 0.2;
+      scene.add(bookMesh);
+
+      const canvas = document.getElementById('threeCanvas');
+      canvas.addEventListener('mousedown', () => { isDragging3D = true; });
+      canvas.addEventListener('mousemove', (e) => {
+        if (isDragging3D) {
+          const deltaMove = {
+            x: e.offsetX - previousMousePosition.x,
+            y: e.offsetY - previousMousePosition.y
+          };
+          bookMesh.rotation.y += deltaMove.x * 0.01;
+          bookMesh.rotation.x += deltaMove.y * 0.01;
+        }
+        previousMousePosition = { x: e.offsetX, y: e.offsetY };
+      });
+      window.addEventListener('mouseup', () => { isDragging3D = false; });
+
+      window.addEventListener('resize', onWindowResize);
+      animate3D();
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      if (!isDragging3D && bookMesh) {
+        bookMesh.rotation.y += 0.005;
+      }
+      if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+      }
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('threeCanvas').parentElement;
+      if (!container) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function setCategory(catKey, catName, hexColor) {
+      document.getElementById('heroCategoryText').innerText = catName;
+      document.getElementById('bookLabel').innerText = `CUBIERTA: ${catName.toUpperCase()} DIARY 2026`;
+      
+      if (bookMesh) {
+        bookMesh.material[4].color.setHex(hexColor);
+        bookMesh.material[5].color.setHex(hexColor);
+      }
+
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.remove('bg-black', 'text-white');
+        btn.classList.add('bg-white', 'text-black');
+      });
+      if (event && event.target) {
+        event.target.classList.remove('bg-white', 'text-black');
+        event.target.classList.add('bg-black', 'text-white');
+      }
+    }
+
+    /* 3. SLIDER VISUAL ATMOSPHERE */
+    const slidesData = [
+      { url: "amor.webp", title: "SCENE #01 — 500 DAYS OF SUMMER (LOVE WILL TEAR US APART)" },
+      { url: "espacio.webp", title: "SCENE #02 — INTERSTELLAR (EXPLORACIÓN ESPACIAL)" },
+      { url: "game.webp", title: "SCENE #03 — SILENT HILL / ATMÓSFERA GAMER NOIR" },
+      { url: "ofice.webp", title: "SCENE #04 — THE OFFICE / MICHAEL SCOTT VIBES" },
+      { url: "pelea.webp", title: "SCENE #05 — FIGHT CLUB (TYLER DURDEN & NARRADOR)" },
+      { url: "peter.webp", title: "SCENE #06 — THE AMAZING SPIDER-MAN (PETER PARKER)" },
+      { url: "araña.webp", title: "SCENE #07 — SPIDER-MAN (TOM HOLLAND ACTION)" },
+      { url: "leon.webp", title: "SCENE #08 — RESIDENT EVIL 4 REMAKE (LEON S. KENNEDY)" },
+      { url: "super.webp", title: "SCENE #09 — SUPERNATURAL (WINCHESTER BROTHERS)" },
+      { url: "bb.webp", title: "SCENE #10 — BREAKING BAD (WALTER & JESSE)" },
+      { url: "jfnf.webp", title: "SCENE #11 — CALL ME BY YOUR NAME (TIMOTHÉE CHALAMET)" },
+      { url: "jobe bellingham.webp", title: "SCENE #12 — JOBE BELLINGHAM (SPORTS ARCHIVE)" },
+      { url: "kill bill.webp", title: "SCENE #13 — KILL BILL (THE BRIDE & KATANA)" },
+      { url: "ara.webp", title: "SCENE #14 — SPIDER-MAN CINEMA SCREENING" },
+      { url: "coono.gif", title: "SCENE #15 — DETROIT: BECOME HUMAN (CONNOR RK800)" },
+      { url: "uhdu.webp", title: "SCENE #16 — ATMOSPHERIC VISUAL LOGBOOK" },
+      { url: "jude bellingham😍😍.webp", title: "SCENE #17 — JUDE BELLINGHAM (REAL MADRID STAR)" }
+    ];
+
+    let currentSlide = 0;
+    let slideTimer = null;
+    let isTransitioning = false;
+
+    function updateSlide(newIndex) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      const slideImg = document.getElementById('cinematicSlide');
+      const slideTitle = document.getElementById('slideTitle');
+      const slideCounter = document.getElementById('slideCounter');
+
+      currentSlide = (newIndex + slidesData.length) % slidesData.length;
+
+      slideImg.style.opacity = '0';
+
+      setTimeout(() => {
+        slideImg.src = slidesData[currentSlide].url;
+        slideTitle.innerText = slidesData[currentSlide].title;
+        if (slideCounter) {
+          const formattedCurrent = String(currentSlide + 1).padStart(2, '0');
+          const formattedTotal = String(slidesData.length).padStart(2, '0');
+          slideCounter.innerText = `${formattedCurrent} / ${formattedTotal}`;
+        }
+
+        requestAnimationFrame(() => {
+          slideImg.style.opacity = '1';
+        });
+
+        renderSlideDots();
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 500);
+      }, 250);
+
+      resetAutoSlide();
+    }
+
+    function nextSlide() { updateSlide(currentSlide + 1); }
+    function prevSlide() { updateSlide(currentSlide - 1); }
+
+    function resetAutoSlide() {
+      clearInterval(slideTimer);
+      slideTimer = setInterval(nextSlide, 6000);
+    }
+
+    function renderSlideDots() {
+      const dotsContainer = document.getElementById('slideDots');
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+
+      slidesData.forEach((slide, idx) => {
+        const dot = document.createElement('button');
+        dot.onclick = () => updateSlide(idx);
+        dot.className = `h-2 rounded-full transition-all duration-300 flex-shrink-0 ${idx === currentSlide ? 'w-7 bg-white shadow' : 'w-2 bg-white/40 hover:bg-white/70'}`;
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function initTouchAndDragSlider() {
+      const container = document.getElementById('sliderContainer');
+      if (!container) return;
+
+      let startX = 0, currentX = 0, isDragging = false;
+      const minSwipeDistance = 35;
+
+      container.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+      }, { passive: true });
+
+      container.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = startX - currentX;
+        if (Math.abs(diffX) > minSwipeDistance && currentX !== 0) {
+          if (diffX > 0) nextSlide();
+          else prevSlide();
+        }
+        startX = 0; currentX = 0;
+      });
+
+      container.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = startX - currentX;
+        if (Math.abs(diffX) > minSwipeDistance && currentX !== 0) {
+          if (diffX > 0) nextSlide();
+          else prevSlide();
+        }
+        startX = 0; currentX = 0;
+      });
+    }
+
+    /* 4. GENERADOR ALEATORIO */
+    function probarSuerte() {
+      const collections = ["cine", "libros", "música", "juegos", "comida", "deportes"];
+      const colors = ["Rojo Matte", "Crema Vintage", "Paletas Verdes", "Paleta Negra", "Azul Cobalto", "Marrón Cuero"];
+      const pages = ["100", "200", "300"];
+
+      const randomCol = collections[Math.floor(Math.random() * collections.length)];
+      const randomColName = randomCol.charAt(0).toUpperCase() + randomCol.slice(1);
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const randomPage = pages[Math.floor(Math.random() * pages.length)];
+
+      document.getElementById('selCollection').value = randomCol;
+      document.getElementById('selColor').value = randomColor;
+      document.getElementById('selPages').value = randomPage;
+
+      const resultBox = document.getElementById('resultBox');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultDesc = document.getElementById('resultDesc');
+
+      resultTitle.innerText = `${randomColName} · ${randomColor} · ${randomPage} Págs`;
+      resultDesc.innerText = `Combinación única generada para tu cuaderno personal de registro.`;
+
+      resultBox.classList.remove('hidden');
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function applyLuckyBook() {
+      alert("¡Diseño guardado en tu colección!");
+    }
+
+    /* 5. DÁNOS A CONOCER */
+    let isDanosExpanded = false;
+    function toggleDanosModal() {
+      isDanosExpanded = !isDanosExpanded;
+      const titleText = document.getElementById('danosTitleText');
+      const card = document.getElementById('danosCard');
+
+      if (isDanosExpanded) {
+        titleText.classList.remove('sm:text-8xl', 'lg:text-9xl');
+        titleText.classList.add('sm:text-4xl', 'lg:text-5xl');
+        card.classList.remove('hidden');
+      } else {
+        titleText.classList.add('sm:text-8xl', 'lg:text-9xl');
+        titleText.classList.remove('sm:text-4xl', 'lg:text-5xl');
+        card.classList.add('hidden');
+      }
+    }
+
+    window.onload = function() {
+      init3D();
+      renderSlideDots();
+      initTouchAndDragSlider();
+      resetAutoSlide();
+    };
+  </script>
+</body>
+</html>
