@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOOK — Luizabeth's Studios</title>
+  <title>BOOK</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -41,6 +40,7 @@
   </script>
 
   <style>
+    /* Estilo de la cuadrícula técnica */
     .bg-grid-pattern {
       background-color: #f7f7f8;
       background-image: 
@@ -51,6 +51,7 @@
       background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
     }
 
+    /* Ocultar barra de desplazamiento */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -59,11 +60,13 @@
       scrollbar-width: none;
     }
 
+    /* Marco limpio sin sombras ni filtros oscuros que opaquen la imagen */
     .clean-vibe {
       box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
       background-color: #0d0d0d;
     }
 
+    /* Efecto de bordes para la caja de Info & Guía de uso */
     .corner-bracket {
       position: relative;
     }
@@ -104,22 +107,16 @@
       color: #000;
     }
 
+    /* Transición suave para menú */
     .side-menu-drawer {
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* Transición suave del banner cinemático */
     .slide-img {
       transition: opacity 0.5s ease-in-out, transform 0.5s ease-out;
       user-select: none;
       -webkit-user-drag: none;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .animate-fade-in {
-      animation: fadeIn 0.25s ease-out forwards;
     }
   </style>
 </head>
@@ -141,22 +138,18 @@
 
     <!-- LOGO CENTRAL -->
     <div class="text-center">
-      <a href="index.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
+      <a href="#" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
         BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
       </a>
     </div>
 
-    <!-- BUSCADOR, USUARIO Y CARRITO (Derecha) -->
+    <!-- BUSCADOR Y CARRITO (Derecha) -->
     <div class="flex items-center gap-3 md:gap-5">
+      <button id="navUserBtn" onclick="openAuthModal()" class="flex items-center gap-2 bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all"><i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel">ENTRAR</span></button>
       <div class="relative hidden sm:flex items-center">
         <input type="text" placeholder="Buscar libros, diarios..." class="w-40 lg:w-56 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
         <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 text-black"></i>
       </div>
-
-      <button id="navUserBtn" onclick="openAuthModal()" class="flex items-center gap-2 bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all">
-        <i data-lucide="user" class="w-3.5 h-3.5"></i>
-        <span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>
-      </button>
 
       <a href="tienda.html" class="relative p-1.5 hover:bg-black/5 rounded-full transition-colors" aria-label="Carrito">
         <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -178,7 +171,7 @@
       </div>
 
       <nav class="space-y-4">
-        <a href="perfil.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="users.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Ajustes</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -186,7 +179,7 @@
           </svg>
         </a>
 
-        <a href="perfil.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
+        <a href="users.html" onclick="toggleMenu()" class="group flex items-center justify-between text-2xl font-bold tracking-tight hover:text-neutral-400 transition-colors">
           <span>Mis libros</span>
           <svg class="w-8 h-4 transform group-hover:translate-x-2 transition-transform" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="0" y1="10" x2="90" y2="10" />
@@ -236,14 +229,9 @@
       </nav>
     </div>
 
-    <div class="border-t border-white/20 pt-6 mt-6 flex justify-between items-center">
-      <div>
-        <div class="text-xs font-mono text-neutral-400">BOOK</div>
-        <div class="text-[10px] text-neutral-500 mt-0.5">Libros digitales</div>
-      </div>
-      <button id="logoutBtn" onclick="logoutUser()" class="hidden text-xs font-mono text-red-400 hover:underline">
-        Cerrar Sesión
-      </button>
+    <div class="border-t border-white/20 pt-6 mt-6">
+      <div class="text-xs font-mono text-neutral-400">BOOK</div>
+      <div class="text-[10px] text-neutral-500 mt-1">Libros digitales</div>
     </div>
   </div>
 
@@ -268,7 +256,7 @@
         </h1>
 
         <div class="mt-6">
-          <button onclick="openAuthModal()" id="heroSignInBtn" class="group inline-flex items-center gap-3 font-mono text-sm tracking-widest uppercase text-black hover:opacity-75 transition-opacity underline underline-offset-8 decoration-1">
+          <button id="heroSignInBtn" onclick="openAuthModal()" class="group inline-flex items-center gap-3 font-mono text-sm tracking-widest uppercase text-black hover:opacity-75 transition-opacity underline underline-offset-8 decoration-1">
             <span>Sign in / Registrarse</span>
             <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
           </button>
@@ -317,7 +305,7 @@
         
         <div class="lg:col-span-8 flex flex-col md:flex-row gap-8 items-center">
           <div class="w-full md:w-1/2 aspect-[3/4] bg-neutral-900 rounded-sm relative overflow-hidden shadow-2xl group">
-            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800" alt="Diario de Cine y Amor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            <img src="amor.webp" alt="Diario de Cine y Amor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
             <div class="absolute bottom-4 left-4 right-4 text-white font-mono text-xs">
               <span class="bg-white text-black px-2 py-0.5 font-bold">Novedad</span>
               <p class="mt-2 text-sm font-bold">Diario de Rodaje & Cinefilia</p>
@@ -374,6 +362,7 @@
   <!-- ==================================================================================== -->
   <!--   SECCIÓN 3: VISUAL ATMOSPHERE / BANNERS EN CAMBIO CONSTANTE (CARRUSEL INTERACTIVO)  -->
   <!-- ==================================================================================== -->
+
   <section class="bg-neutral-950 py-12 border-b border-black overflow-hidden relative select-none">
     <div class="max-w-7xl mx-auto px-4">
       
@@ -396,7 +385,7 @@
         
         <!-- Imagen Actual -->
         <img id="cinematicSlide" 
-             src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=1200" 
+             src="amor.webp" 
              alt="Visual Banner Atmosphere" 
              class="slide-img w-full h-full object-contain max-h-full transition-all duration-500">
         
@@ -449,7 +438,7 @@
         <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
           <div class="font-archivo text-3xl mb-4">1 —</div>
           <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
-            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=600" alt="Coleccion Kill Bill" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <img src="kill bill.webp" alt="Coleccion Kill Bill" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
           <div>
             <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 01</span>
@@ -460,7 +449,7 @@
         <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
           <div class="font-archivo text-3xl mb-4">2 —</div>
           <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
-            <img src="https://images.unsplash.com/photo-1507842229431-7e810a916790?auto=format&fit=crop&q=80&w=600" alt="Coleccion Breaking Bad" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <img src="bb.webp" alt="Coleccion Breaking Bad" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
           <div>
             <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 02</span>
@@ -471,7 +460,7 @@
         <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
           <div class="font-archivo text-3xl mb-4">3 —</div>
           <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
-            <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=600" alt="Coleccion Call Me By Your Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <img src="jfnf.webp" alt="Coleccion Call Me By Your Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
           <div>
             <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 03</span>
@@ -482,7 +471,7 @@
         <div class="p-6 flex flex-col justify-between group hover:bg-black hover:text-white transition-colors duration-300">
           <div class="font-archivo text-3xl mb-4">4 —</div>
           <div class="aspect-square bg-neutral-100 overflow-hidden mb-6 border border-black/10">
-            <img src="https://images.unsplash.com/photo-1517649763962-0c6232660102?auto=format&fit=crop&q=80&w=600" alt="Coleccion Sports Journal" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <img src="jobe bellingham.webp" alt="Coleccion Sports Journal" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
           <div>
             <span class="font-mono text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-300">Colección No. 04</span>
@@ -537,7 +526,7 @@
 
         <div class="lg:col-span-5">
           <div class="aspect-[4/3] bg-neutral-900 border border-black overflow-hidden relative shadow-xl">
-            <img src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=800" alt="Luizabeths Studios Workspace" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
+            <img src="Rediseño de logo(1).png" alt="Luizabeths Studios Workspace" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
             <div class="absolute bottom-3 left-3 bg-black text-white font-mono text-[10px] px-2 py-1">
               STUDIO ARCHIVE / VOL. 1
             </div>
@@ -601,13 +590,13 @@
         
         <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
           <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
-            <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=600" alt="Diario de Sombras" class="w-full h-full object-cover">
+            <img src="ara.webp" alt="Diario de Sombras" class="w-full h-full object-cover">
             <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">320 págs</span>
           </div>
           <div>
             <h3 class="font-bold text-base font-syne">Cinema Meme & Cinema Spidey</h3>
             <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <img src="super.webp" class="w-6 h-6 rounded-full object-cover border border-black">
               <span class="font-mono text-xs text-neutral-700">@valeria_cine</span>
             </div>
           </div>
@@ -615,13 +604,13 @@
 
         <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
           <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
-            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600" alt="Bitacora Gamer" class="w-full h-full object-cover">
+            <img src="coono.gif" alt="Bitacora Gamer" class="w-full h-full object-cover">
             <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">180 págs</span>
           </div>
           <div>
             <h3 class="font-bold text-base font-syne">Detroit: Become Human & Cyber Journal</h3>
             <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <img src="leon.webp" class="w-6 h-6 rounded-full object-cover border border-black">
               <span class="font-mono text-xs text-neutral-700">@connor_rk800</span>
             </div>
           </div>
@@ -629,13 +618,13 @@
 
         <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
           <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
-            <img src="https://images.unsplash.com/photo-1561053720-76cd7d72c130?auto=format&fit=crop&q=80&w=600" alt="Bitacora Deportes" class="w-full h-full object-cover">
+            <img src="jude bellingham😍😍.webp" alt="Bitacora Deportes" class="w-full h-full object-cover">
             <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">250 págs</span>
           </div>
           <div>
             <h3 class="font-bold text-base font-syne">Football Diaries & Jude Stars</h3>
             <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <img src="jobe bellingham.webp" class="w-6 h-6 rounded-full object-cover border border-black">
               <span class="font-mono text-xs text-neutral-700">@bellingham_fan</span>
             </div>
           </div>
@@ -643,13 +632,13 @@
 
         <div class="bg-white p-4 border border-black shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-transform">
           <div class="aspect-[3/4] bg-neutral-800 overflow-hidden mb-4 relative">
-            <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=600" alt="Logbook Atmosferico" class="w-full h-full object-cover">
+            <img src="uhdu.webp" alt="Logbook Atmosferico" class="w-full h-full object-cover">
             <span class="absolute top-2 right-2 bg-black text-white font-mono text-[9px] px-1.5 py-0.5">200 págs</span>
           </div>
           <div>
             <h3 class="font-bold text-base font-syne">Logbook de Fotografía & Escenas</h3>
             <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
-              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full object-cover border border-black">
+              <img src="pelea.webp" class="w-6 h-6 rounded-full object-cover border border-black">
               <span class="font-mono text-xs text-neutral-700">@retro_dev</span>
             </div>
           </div>
@@ -689,7 +678,7 @@
       </h2>
 
       <div class="relative w-full max-w-3xl mx-auto aspect-video rounded-sm overflow-hidden border border-neutral-700 shadow-2xl bg-neutral-900 group">
-        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200" alt="Video Demo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <img src="bb.webp" alt="Video Demo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
         <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
           <button onclick="playDemoVideo()" class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
             <i data-lucide="play" class="w-8 h-8 fill-black ml-1"></i>
@@ -833,6 +822,431 @@
   </section>
 
   <!-- ==========================================
+       SECCIÓN 10: PIE DE PÁGINA (FOOTER)
+  =========================================== -->
+  <footer class="bg-black text-white py-16 px-4 md:px-12 border-t border-neutral-900">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- Izquierda: Imagen Graffiti Logo -->
+        <div class="lg:col-span-5">
+          <div class="border-b border-white/20 pb-4">
+            <img src="huhu.jpg" alt="BOOK Graffiti Logo" class="w-full max-w-sm h-auto object-contain">
+           <span class="text-xs font-mono text-neutral-400 block tracking-widest mt-1">X<span class="text-xs font-mono text-neutral-400 block tracking-widest mt-1">LUIZABETH'S.STUDIOS</span>
+          </div>
+          <div class="font-mono text-[10px] text-neutral-500 uppercase tracking-widest mt-3">
+            GRAFFITI ZONE
+          </div>
+        </div>
+
+        <!-- Derecha: Creado por / luizabeth's.studios / Conoce más / Proyecto -->
+        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
+          
+          <div class="space-y-3">
+            <span class="text-neutral-500 uppercase tracking-widest block">CRÉDITOS Y DESARROLLO</span>
+            <p class="text-sm font-bold text-white">Creado por</p>
+            <p class="text-base text-neutral-200 font-syne font-bold">luizabeth's.studios</p>
+            
+            <div class="pt-2">
+              <span class="text-neutral-500 uppercase tracking-widest block mb-1">CONOCE MÁS</span>
+              <a href="https://clientes-chi.vercel.app" target="_blank" rel="noopener noreferrer" class="text-white underline underline-offset-4 hover:text-neutral-400 transition-colors">
+                clientes-chi.vercel.app
+              </a>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <span class="text-neutral-500 uppercase tracking-widest block">SOBRE EL PROYECTO</span>
+            <p class="text-neutral-400 leading-relaxed text-[11px] font-sans">
+              BOOK es un proyecto independiente de diseño editorial y desarrollo de productos impresos y digitales desarrollado en Venezuela. Inspirado en la identidad visual cinematográfica, busca elevar el acto cotidiano de escribir un diario a una pieza de arte coleccionable.
+            </p>
+            <div class="text-[10px] text-neutral-600 pt-4">
+              © 2026 LUIZABETH'S.STUDIOS. TODOS LOS DERECHOS RESERVADOS.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       LÓGICA JAVASCRIPT & THREE.JS
+  =========================================== -->
+  <script>
+    // Inicializar Iconos Lucide
+    lucide.createIcons();
+
+    /* ==========================================
+       1. NAVEGACIÓN Y MENÚ LATERAL
+    =========================================== */
+    let isMenuOpen = false;
+    function toggleMenu() {
+      isMenuOpen = !isMenuOpen;
+      const sideMenu = document.getElementById('sideMenu');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const line1 = document.getElementById('line1');
+      const line2 = document.getElementById('line2');
+
+      if (isMenuOpen) {
+        sideMenu.classList.remove('-translate-x-full');
+        menuOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        line1.classList.add('rotate-45', 'translate-y-[0px]');
+        line2.classList.add('-rotate-45', 'translate-y-[0px]');
+      } else {
+        sideMenu.classList.add('-translate-x-full');
+        menuOverlay.classList.add('opacity-0', 'pointer-events-none');
+        line1.classList.remove('rotate-45', 'translate-y-[0px]');
+        line2.classList.remove('-rotate-45', 'translate-y-[0px]');
+      }
+    }
+
+    /* ==========================================
+       2. LIBRO INTERACTIVO 3D CON THREE.JS
+    =========================================== */
+    let scene, camera, renderer, bookMesh;
+    let isDragging3D = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    function init3D() {
+      const container = document.getElementById('threeCanvas').parentElement;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 7);
+
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas'), alpha: true, antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Luces
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      dirLight.position.set(5, 5, 5);
+      scene.add(dirLight);
+
+      const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      backLight.position.set(-5, -5, -5);
+      scene.add(backLight);
+
+      // Crear Libro 3D
+      const bookWidth = 2.4;
+      const bookHeight = 3.2;
+      const bookDepth = 0.5;
+
+      const geometry = new THREE.BoxGeometry(bookWidth, bookHeight, bookDepth);
+      
+      const materials = [
+        new THREE.MeshStandardMaterial({ color: 0x111111 }), // Derecha
+        new THREE.MeshStandardMaterial({ color: 0x111111 }), // Izquierda
+        new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }), // Arriba
+        new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }), // Abajo
+        new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.2 }), // Frente
+        new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.2 })  // Atrás
+      ];
+
+      bookMesh = new THREE.Mesh(geometry, materials);
+      bookMesh.rotation.y = -0.5;
+      bookMesh.rotation.x = 0.2;
+      scene.add(bookMesh);
+
+      // Eventos de ratón para rotar el libro
+      const canvas = document.getElementById('threeCanvas');
+      canvas.addEventListener('mousedown', (e) => { isDragging3D = true; });
+      canvas.addEventListener('mousemove', (e) => {
+        if (isDragging3D) {
+          const deltaMove = {
+            x: e.offsetX - previousMousePosition.x,
+            y: e.offsetY - previousMousePosition.y
+          };
+          bookMesh.rotation.y += deltaMove.x * 0.01;
+          bookMesh.rotation.x += deltaMove.y * 0.01;
+        }
+        previousMousePosition = { x: e.offsetX, y: e.offsetY };
+      });
+      window.addEventListener('mouseup', () => { isDragging3D = false; });
+
+      // Resize
+      window.addEventListener('resize', onWindowResize);
+
+      animate3D();
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      if (!isDragging3D && bookMesh) {
+        bookMesh.rotation.y += 0.005;
+      }
+      if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+      }
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('threeCanvas').parentElement;
+      if (!container) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function setCategory(catKey, catName, hexColor) {
+      document.getElementById('heroCategoryText').innerText = catName;
+      document.getElementById('bookLabel').innerText = `CUBIERTA: ${catName.toUpperCase()} DIARY 2026`;
+      
+      if (bookMesh) {
+        bookMesh.material[4].color.setHex(hexColor);
+        bookMesh.material[5].color.setHex(hexColor);
+      }
+
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.remove('bg-black', 'text-white');
+        btn.classList.add('bg-white', 'text-black');
+      });
+      if (event && event.target) {
+        event.target.classList.remove('bg-white', 'text-black');
+        event.target.classList.add('bg-black', 'text-white');
+      }
+    }
+
+    /* ==================================================================================== */
+    /* 3. SLIDER VISUAL ATMOSPHERE — TODAS LAS 17 IMÁGENES COMPLETAS SIN FILTROS OSCUROS     */
+    /* ==================================================================================== */
+
+    const slidesData = [
+      { url: "amor.webp", title: "SCENE #01 — 500 DAYS OF SUMMER (LOVE WILL TEAR US APART)" },
+      { url: "espacio.webp", title: "SCENE #02 — INTERSTELLAR (EXPLORACIÓN ESPACIAL)" },
+      { url: "game.webp", title: "SCENE #03 — SILENT HILL / ATMÓSFERA GAMER NOIR" },
+      { url: "ofice.webp", title: "SCENE #04 — THE OFFICE / MICHAEL SCOTT VIBES" },
+      { url: "pelea.webp", title: "SCENE #05 — FIGHT CLUB (TYLER DURDEN & NARRADOR)" },
+      { url: "peter.webp", title: "SCENE #06 — THE AMAZING SPIDER-MAN (PETER PARKER)" },
+      { url: "araña.webp", title: "SCENE #07 — SPIDER-MAN (TOM HOLLAND ACTION)" },
+      { url: "leon.webp", title: "SCENE #08 — RESIDENT EVIL 4 REMAKE (LEON S. KENNEDY)" },
+      { url: "super.webp", title: "SCENE #09 — SUPERNATURAL (WINCHESTER BROTHERS)" },
+      { url: "bb.webp", title: "SCENE #10 — BREAKING BAD (WALTER & JESSE)" },
+      { url: "jfnf.webp", title: "SCENE #11 — CALL ME BY YOUR NAME (TIMOTHÉE CHALAMET)" },
+      { url: "jobe bellingham.webp", title: "SCENE #12 — JOBE BELLINGHAM (SPORTS ARCHIVE)" },
+      { url: "kill bill.webp", title: "SCENE #13 — KILL BILL (THE BRIDE & KATANA)" },
+      { url: "ara.webp", title: "SCENE #14 — SPIDER-MAN CINEMA SCREENING" },
+      { url: "coono.gif", title: "SCENE #15 — DETROIT: BECOME HUMAN (CONNOR RK800)" },
+      { url: "uhdu.webp", title: "SCENE #16 — ATMOSPHERIC VISUAL LOGBOOK" },
+      { url: "jude bellingham😍😍.webp", title: "SCENE #17 — JUDE BELLINGHAM (REAL MADRID STAR)" }
+    ];
+
+    let currentSlide = 0;
+    let slideTimer = null;
+    let isTransitioning = false;
+
+    function updateSlide(newIndex) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      const slideImg = document.getElementById('cinematicSlide');
+      const slideTitle = document.getElementById('slideTitle');
+      const slideCounter = document.getElementById('slideCounter');
+
+      currentSlide = (newIndex + slidesData.length) % slidesData.length;
+
+      slideImg.style.opacity = '0';
+
+      setTimeout(() => {
+        slideImg.src = slidesData[currentSlide].url;
+        slideTitle.innerText = slidesData[currentSlide].title;
+        if (slideCounter) {
+          const formattedCurrent = String(currentSlide + 1).padStart(2, '0');
+          const formattedTotal = String(slidesData.length).padStart(2, '0');
+          slideCounter.innerText = `${formattedCurrent} / ${formattedTotal}`;
+        }
+
+        requestAnimationFrame(() => {
+          slideImg.style.opacity = '1';
+        });
+
+        renderSlideDots();
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 500);
+      }, 250);
+
+      resetAutoSlide();
+    }
+
+    function nextSlide() {
+      updateSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      updateSlide(currentSlide - 1);
+    }
+
+    function resetAutoSlide() {
+      clearInterval(slideTimer);
+      slideTimer = setInterval(nextSlide, 6000);
+    }
+
+    function renderSlideDots() {
+      const dotsContainer = document.getElementById('slideDots');
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+
+      slidesData.forEach((slide, idx) => {
+        const dot = document.createElement('button');
+        dot.onclick = () => updateSlide(idx);
+        dot.className = `h-2 rounded-full transition-all duration-300 flex-shrink-0 ${idx === currentSlide ? 'w-7 bg-white shadow' : 'w-2 bg-white/40 hover:bg-white/70'}`;
+        dot.ariaLabel = `Ir a escena ${idx + 1}`;
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function initTouchAndDragSlider() {
+      const container = document.getElementById('sliderContainer');
+      if (!container) return;
+
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+      const minSwipeDistance = 35;
+
+      container.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+      }, { passive: true });
+
+      container.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = startX - currentX;
+
+        if (Math.abs(diffX) > minSwipeDistance && currentX !== 0) {
+          if (diffX > 0) nextSlide();
+          else prevSlide();
+        }
+        startX = 0;
+        currentX = 0;
+      });
+
+      container.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = startX - currentX;
+
+        if (Math.abs(diffX) > minSwipeDistance && currentX !== 0) {
+          if (diffX > 0) nextSlide();
+          else prevSlide();
+        }
+        startX = 0;
+        currentX = 0;
+      });
+    }
+
+    /* ==========================================
+       4. GENERADOR ALEATORIO "PROBAR SUERTE"
+    =========================================== */
+    function probarSuerte() {
+      const collections = ["cine", "libros", "música", "juegos", "comida", "deportes"];
+      const colors = ["Rojo Matte", "Crema Vintage", "Paletas Verdes", "Paleta Negra", "Azul Cobalto", "Marrón Cuero"];
+      const pages = ["100", "200", "300"];
+
+      const randomCol = collections[Math.floor(Math.random() * collections.length)];
+      const randomColName = randomCol.charAt(0).toUpperCase() + randomCol.slice(1);
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const randomPage = pages[Math.floor(Math.random() * pages.length)];
+
+      document.getElementById('selCollection').value = randomCol;
+      document.getElementById('selColor').value = randomColor;
+      document.getElementById('selPages').value = randomPage;
+
+      const resultBox = document.getElementById('resultBox');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultDesc = document.getElementById('resultDesc');
+
+      resultTitle.innerText = `${randomColName} · ${randomColor} · ${randomPage} Págs`;
+      resultDesc.innerText = `Combinación única generada para tu cuaderno personal de registro.`;
+
+      resultBox.classList.remove('hidden');
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function applyLuckyBook() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="bg-white p-6 max-w-sm w-full rounded-lg border border-black font-mono text-center space-y-4">
+          <h3 class="font-bold text-lg font-syne">¡DISEÑO GUARDADO!</h3>
+          <p class="text-xs text-neutral-600">Esta combinación se ha añadido a tus proyectos guardados.</p>
+          <button onclick="this.closest('.fixed').remove()" class="w-full py-2 bg-black text-white text-xs uppercase rounded">Aceptar</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    /* ==========================================
+       5. INTERACCIÓN "DÁNOS A CONOCER"
+    =========================================== */
+    let isDanosExpanded = false;
+    function toggleDanosModal() {
+      isDanosExpanded = !isDanosExpanded;
+      const titleText = document.getElementById('danosTitleText');
+      const card = document.getElementById('danosCard');
+
+      if (isDanosExpanded) {
+        titleText.classList.remove('sm:text-8xl', 'lg:text-9xl');
+        titleText.classList.add('sm:text-4xl', 'lg:text-5xl');
+        card.classList.remove('hidden');
+      } else {
+        titleText.classList.add('sm:text-8xl', 'lg:text-9xl');
+        titleText.classList.remove('sm:text-4xl', 'lg:text-5xl');
+        card.classList.add('hidden');
+      }
+    }
+
+    function playDemoVideo() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="bg-black p-4 max-w-2xl w-full rounded border border-neutral-700 font-mono text-center text-white space-y-4 relative">
+          <button onclick="this.closest('.fixed').remove()" class="absolute top-2 right-2 text-white text-sm bg-neutral-800 p-2 rounded-full">✕</button>
+          <h3 class="font-bold text-base font-syne uppercase">Maquetación en tiempo real — Visual Book</h3>
+          <div class="aspect-video bg-neutral-900 flex items-center justify-center border border-neutral-800">
+            <span class="text-xs text-neutral-400">[ DEMO DE MAQUETACIÓN EN VIVO LUIZABETH'S STUDIOS ]</span>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    // Inicializar todo al cargar la ventana
+    window.onload = function() {
+      init3D();
+      renderSlideDots();
+      initTouchAndDragSlider();
+      resetAutoSlide();
+    };
+  </script>
+  <!-- ==========================================
        MODAL INTERACTIVO DE AUTENTICACIÓN
   =========================================== -->
   <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -948,60 +1362,9 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       SECCIÓN 10: PIE DE PÁGINA (FOOTER)
-  =========================================== -->
-  <footer class="bg-black text-white py-16 px-4 md:px-12 border-t border-neutral-900">
-    <div class="max-w-7xl mx-auto">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-        
-        <!-- Izquierda: Imagen Graffiti Logo -->
-        <div class="lg:col-span-5">
-          <div class="border-b border-white/20 pb-4">
-            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&q=80&w=800" alt="BOOK Graffiti Logo" class="w-full max-w-sm h-auto object-contain">
-           <span class="text-xs font-mono text-neutral-400 block tracking-widest mt-1">LUIZABETH'S.STUDIOS</span>
-          </div>
-          <div class="font-mono text-[10px] text-neutral-500 uppercase tracking-widest mt-3">
-            GRAFFITI ZONE
-          </div>
-        </div>
-
-        <!-- Derecha: Creado por / luizabeth's.studios / Conoce más / Proyecto -->
-        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
-          
-          <div class="space-y-3">
-            <span class="text-neutral-500 uppercase tracking-widest block">CRÉDITOS Y DESARROLLO</span>
-            <p class="text-sm font-bold text-white">Creado por</p>
-            <p class="text-base text-neutral-200 font-syne font-bold">luizabeth's.studios</p>
-            
-            <div class="pt-2">
-              <span class="text-neutral-500 uppercase tracking-widest block mb-1">CONOCE MÁS</span>
-              <a href="https://clientes-chi.vercel.app" target="_blank" rel="noopener noreferrer" class="text-white underline underline-offset-4 hover:text-neutral-400 transition-colors">
-                clientes-chi.vercel.app
-              </a>
-            </div>
-          </div>
-
-          <div class="space-y-3">
-            <span class="text-neutral-500 uppercase tracking-widest block">SOBRE EL PROYECTO</span>
-            <p class="text-neutral-400 leading-relaxed text-[11px] font-sans">
-              BOOK es un proyecto independiente de diseño editorial y desarrollo de productos impresos y digitales desarrollado en Venezuela. Inspirado en la identidad visual cinematográfica, busca elevar el acto cotidiano de escribir un diario a una pieza de arte coleccionable.
-            </p>
-            <div class="text-[10px] text-neutral-600 pt-4">
-              © 2026 LUIZABETH'S.STUDIOS. TODOS LOS DERECHOS RESERVADOS.
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  </footer>
 
   <!-- ==========================================
-       LÓGICA JAVASCRIPT & THREE.JS & SUPABASE AUTH
+       LÓGICA JAVASCRIPT CON SUPABASE INTEGRADO
   =========================================== -->
   <script>
     const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
@@ -1062,7 +1425,7 @@
         if (logoutBtn) logoutBtn.classList.remove('hidden');
 
         if (navUserBtn) {
-          navUserBtn.onclick = function() { window.location.href = "perfil.html"; };
+          navUserBtn.onclick = function() { window.location.href = "users.html"; };
           if (userPhoto) {
             navUserBtn.innerHTML = '<img src="' + userPhoto + '" class="w-5 h-5 rounded-full object-cover border border-white"><span class="uppercase tracking-wider font-mono text-xs">' + userName + '</span>';
           } else {
@@ -1072,7 +1435,7 @@
 
         if (heroSignInBtn) {
           heroSignInBtn.innerHTML = '<span>HOLA, ' + userName + ' (IR A PERFIL)</span><i data-lucide="arrow-right" class="w-4 h-4"></i>';
-          heroSignInBtn.onclick = function() { window.location.href = "perfil.html"; };
+          heroSignInBtn.onclick = function() { window.location.href = "users.html"; };
         }
       } else {
         if (logoutBtn) logoutBtn.classList.add('hidden');
@@ -1166,7 +1529,7 @@
         showAlert("¡Registrado con éxito!", false);
         setTimeout(function() { 
           window.closeAuthModal(); 
-          window.location.href = "perfil.html"; 
+          window.location.href = "users.html"; 
         }, 1000);
 
       } catch (error) {
@@ -1211,7 +1574,7 @@
         showAlert("¡Sesión iniciada correctamente!", false);
         setTimeout(function() { 
           window.closeAuthModal(); 
-          window.location.href = "perfil.html"; 
+          window.location.href = "users.html"; 
         }, 800);
       } catch (error) {
         console.error("Login Error:", error);
@@ -1241,7 +1604,9 @@
       window.location.reload();
     };
 
+    // Inicialización al cargar la página
     document.addEventListener('DOMContentLoaded', async function() {
+      // Verificar si hay sesión activa en Supabase
       try {
         const { data } = await supabaseClient.auth.getSession();
         if (data && data.session && data.session.user) {
@@ -1287,301 +1652,6 @@
     });
   </script>
 
-  <!-- ==========================================
-       THREE.JS Y CONTROLES UI
-  =========================================== -->
-  <script>
-    lucide.createIcons();
 
-    let isMenuOpen = false;
-    function toggleMenu() {
-      isMenuOpen = !isMenuOpen;
-      const sideMenu = document.getElementById('sideMenu');
-      const menuOverlay = document.getElementById('menuOverlay');
-      const line1 = document.getElementById('line1');
-      const line2 = document.getElementById('line2');
-
-      if (isMenuOpen) {
-        sideMenu.classList.remove('-translate-x-full');
-        menuOverlay.classList.remove('opacity-0', 'pointer-events-none');
-        line1.classList.add('rotate-45', 'translate-y-[0px]');
-        line2.classList.add('-rotate-45', 'translate-y-[0px]');
-      } else {
-        sideMenu.classList.add('-translate-x-full');
-        menuOverlay.classList.add('opacity-0', 'pointer-events-none');
-        line1.classList.remove('rotate-45', 'translate-y-[0px]');
-        line2.classList.remove('-rotate-45', 'translate-y-[0px]');
-      }
-    }
-
-    let scene, camera, renderer, bookMesh;
-    let isDragging3D = false;
-    let previousMousePosition = { x: 0, y: 0 };
-
-    function init3D() {
-      const container = document.getElementById('threeCanvas').parentElement;
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      camera.position.set(0, 0, 7);
-
-      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas'), alpha: true, antialias: true });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-      scene.add(ambientLight);
-
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-      dirLight.position.set(5, 5, 5);
-      scene.add(dirLight);
-
-      const geometry = new THREE.BoxGeometry(2.4, 3.2, 0.5);
-      const materials = [
-        new THREE.MeshStandardMaterial({ color: 0x111111 }),
-        new THREE.MeshStandardMaterial({ color: 0x111111 }),
-        new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }),
-        new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }),
-        new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.2 }),
-        new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.2 })
-      ];
-
-      bookMesh = new THREE.Mesh(geometry, materials);
-      bookMesh.rotation.y = -0.5;
-      bookMesh.rotation.x = 0.2;
-      scene.add(bookMesh);
-
-      const canvasElement = document.getElementById('threeCanvas');
-      canvasElement.addEventListener('mousedown', () => { isDragging3D = true; });
-      canvasElement.addEventListener('mousemove', (e) => {
-        if (isDragging3D) {
-          const deltaMove = {
-            x: e.offsetX - previousMousePosition.x,
-            y: e.offsetY - previousMousePosition.y
-          };
-          bookMesh.rotation.y += deltaMove.x * 0.01;
-          bookMesh.rotation.x += deltaMove.y * 0.01;
-        }
-        previousMousePosition = { x: e.offsetX, y: e.offsetY };
-      });
-      window.addEventListener('mouseup', () => { isDragging3D = false; });
-
-      window.addEventListener('resize', onWindowResize);
-      animate3D();
-    }
-
-    function animate3D() {
-      requestAnimationFrame(animate3D);
-      if (!isDragging3D && bookMesh) {
-        bookMesh.rotation.y += 0.005;
-      }
-      renderer.render(scene, camera);
-    }
-
-    function onWindowResize() {
-      const container = document.getElementById('threeCanvas').parentElement;
-      if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-    }
-
-    window.setCategory = function(catKey, catName, hexColor) {
-      document.getElementById('heroCategoryText').innerText = catName;
-      document.getElementById('bookLabel').innerText = 'CUBIERTA: ' + catName.toUpperCase() + ' DIARY 2026';
-      if (bookMesh) {
-        bookMesh.material[4].color.setHex(hexColor);
-        bookMesh.material[5].color.setHex(hexColor);
-      }
-    };
-
-    /* ==========================================
-       3. CARRUSEL / SLIDER DE BANNERS CINEMÁTICOS
-    =========================================== */
-    const slidesData = [
-      { src: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=1200", title: "SCENE #01 — 500 DAYS OF SUMMER" },
-      { src: "https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&q=80&w=1200", title: "SCENE #02 — SPIDER-VERSE UNIVERSE" },
-      { src: "https://images.unsplash.com/photo-1507842229431-7e810a916790?auto=format&fit=crop&q=80&w=1200", title: "SCENE #03 — BREAKING BAD CHEMISTRY" },
-      { src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200", title: "SCENE #04 — CYBERPUNK DETROIT" },
-      { src: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1200", title: "SCENE #05 — CALL ME BY YOUR NAME" },
-      { src: "https://images.unsplash.com/photo-1517649763962-0c6232660102?auto=format&fit=crop&q=80&w=1200", title: "SCENE #06 — ATHLETE & STADIUMS" },
-      { src: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200", title: "SCENE #07 — FOOTBALL LEGENDS" },
-      { src: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=1200", title: "SCENE #08 — RESIDENT EVIL RETRO" },
-      { src: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=1200", title: "SCENE #09 — FIGHT CLUB ATMOSPHERE" },
-      { src: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=1200", title: "SCENE #10 — SUPER HERO ARCHIVE" },
-      { src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=1200", title: "SCENE #11 — ATMOSPHERIC VISUALS" },
-      { src: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200", title: "SCENE #12 — LUIZABETH'S STUDIOS 1" },
-      { src: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=1200", title: "SCENE #13 — STUDIO REDESIGN LOGO" },
-      { src: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=1200", title: "SCENE #14 — CINEMATIC ROMANCE" },
-      { src: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&q=80&w=1200", title: "SCENE #15 — URBAN GRAPHITI" },
-      { src: "https://images.unsplash.com/photo-1507842229431-7e810a916790?auto=format&fit=crop&q=80&w=1200", title: "SCENE #16 — EXPERIMENTAL LAB" },
-      { src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200", title: "SCENE #17 — DIGITAL DREAMS" }
-    ];
-
-    let currentSlide = 0;
-    const totalSlides = slidesData.length;
-    let slideInterval;
-
-    function initSlider() {
-      const dotsContainer = document.getElementById('slideDots');
-      if (!dotsContainer) return;
-      dotsContainer.innerHTML = '';
-
-      slidesData.forEach((slide, index) => {
-        const dot = document.createElement('button');
-        dot.className = `w-8 h-10 rounded border overflow-hidden flex-shrink-0 transition-all ${index === 0 ? 'border-white scale-105 opacity-100' : 'border-neutral-700 opacity-60 hover:opacity-100'}`;
-        dot.innerHTML = `<img src="${slide.src}" class="w-full h-full object-cover">`;
-        dot.onclick = () => {
-          goToSlide(index);
-          resetAutoSlide();
-        };
-        dotsContainer.appendChild(dot);
-      });
-
-      updateSlideView();
-      startAutoSlide();
-
-      const sliderContainer = document.getElementById('sliderContainer');
-      let touchStartX = 0;
-      let touchEndX = 0;
-
-      sliderContainer.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-
-      sliderContainer.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, { passive: true });
-
-      function handleSwipe() {
-        if (touchEndX < touchStartX - 50) {
-          nextSlide();
-          resetAutoSlide();
-        }
-        if (touchEndX > touchStartX + 50) {
-          prevSlide();
-          resetAutoSlide();
-        }
-      }
-    }
-
-    function updateSlideView() {
-      const imgElem = document.getElementById('cinematicSlide');
-      const titleElem = document.getElementById('slideTitle');
-      const counterElem = document.getElementById('slideCounter');
-      
-      if (!imgElem) return;
-
-      imgElem.style.opacity = '0';
-      setTimeout(() => {
-        imgElem.src = slidesData[currentSlide].src;
-        titleElem.innerText = slidesData[currentSlide].title;
-        counterElem.innerText = String(currentSlide + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
-        imgElem.style.opacity = '1';
-      }, 200);
-
-      const dots = document.getElementById('slideDots').children;
-      for (let i = 0; i < dots.length; i++) {
-        if (i === currentSlide) {
-          dots[i].className = 'w-8 h-10 rounded border border-white scale-105 opacity-100 flex-shrink-0 transition-all shadow';
-        } else {
-          dots[i].className = 'w-8 h-10 rounded border border-neutral-700 opacity-60 hover:opacity-100 flex-shrink-0 transition-all';
-        }
-      }
-    }
-
-    window.nextSlide = function() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateSlideView();
-    };
-
-    window.prevSlide = function() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateSlideView();
-    };
-
-    function goToSlide(index) {
-      currentSlide = index;
-      updateSlideView();
-    }
-
-    function startAutoSlide() {
-      slideInterval = setInterval(() => {
-        nextSlide();
-      }, 4000);
-    }
-
-    function resetAutoSlide() {
-      clearInterval(slideInterval);
-      startAutoSlide();
-    }
-
-    /* ==========================================
-       4. GENERADOR EDITORIAL "PROBAR SUERTE"
-    =========================================== */
-    window.probarSuerte = function() {
-      const collections = ["Cine", "Libros", "Música", "Juegos", "Comida", "Deportes"];
-      const colors = ["Rojo Matte", "Crema Vintage", "Paletas Verdes", "Paleta Negra", "Azul Cobalto", "Marrón Cuero"];
-      const pages = ["100 Págs", "200 Págs", "300 Págs"];
-
-      const randCol = collections[Math.floor(Math.random() * collections.length)];
-      const randColor = colors[Math.floor(Math.random() * colors.length)];
-      const randPage = pages[Math.floor(Math.random() * pages.length)];
-
-      document.getElementById('selCollection').value = randCol.toLowerCase() === 'cine' ? 'cine' : randCol.toLowerCase();
-      document.getElementById('selColor').value = randColor;
-      document.getElementById('selPages').value = randPage.split(' ')[0];
-
-      const titleElem = document.getElementById('resultTitle');
-      const descElem = document.getElementById('resultDesc');
-      const boxElem = document.getElementById('resultBox');
-
-      titleElem.innerText = randCol + " · " + randColor + " · " + randPage;
-      descElem.innerText = "Edición seleccionada por el archivo estelar. Ideal para registrar tus mejores momentos y reseñas de " + randCol.toLowerCase() + ".";
-      boxElem.classList.remove('hidden');
-    };
-
-    window.applyLuckyBook = function() {
-      alert("¡Configuración cargada en el maquetador 3D! Disfruta tu edición especial.");
-    };
-
-    /* ==========================================
-       5. BANNER EXPANDIBLE "DÁNOS A CONOCER"
-    =========================================== */
-    let isDanosOpen = false;
-    window.toggleDanosModal = function() {
-      isDanosOpen = !isDanosOpen;
-      const card = document.getElementById('danosCard');
-      const titleText = document.getElementById('danosTitleText');
-      if (isDanosOpen) {
-        card.classList.remove('hidden');
-        titleText.innerText = "¡GRACIAS POR COMPARTIR!";
-      } else {
-        card.classList.add('hidden');
-        titleText.innerText = "Dános a conocer";
-      }
-    };
-
-    window.playDemoVideo = function() {
-      alert("Cargando simulador de maquetación en vivo de Luizabeth's Studios...");
-    };
-
-    window.onload = function() {
-      init3D();
-      initSlider();
-    };
-
-    window.addEventListener('storage', function(event) {
-      if (event.key === 'book_user_session') {
-        var updatedUser = event.newValue ? JSON.parse(event.newValue) : null;
-        if (typeof updateUIWithUser === 'function') {
-          updateUIWithUser(updatedUser);
-        }
-      }
-    });
-  </script>
 </body>
 </html>
