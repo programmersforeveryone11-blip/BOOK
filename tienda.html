@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOK — Tienda</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Three.js for 3D Books -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Space Grotesk', 'monospace'],
+            syne: ['Syne', 'sans-serif'],
+            archivo: ['Archivo Black', 'sans-serif'],
+          },
+          colors: {
+            appbg: '#0a0a0a',
+            appcard: '#141414',
+            appgray: '#222222',
+            gridline: '#d1d5db',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos base compartidos con index.html */
+    .bg-grid-pattern {
+      background-color: #f7f7f8;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-[#f7f7f8] text-black font-sans antialiased selection:bg-black selection:text-white min-h-screen flex flex-col">
+
+  <!-- ==========================================
+       BARRA DE NAVEGACIÓN SUPERIOR (Copiada de index.html)
+  =========================================== -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-black/10 px-4 md:px-8 py-3 flex items-center justify-between">
+    <div class="flex items-center">
+      <a href="index.html" class="group flex items-center gap-4 focus:outline-none z-50 relative" aria-label="Volver al inicio">
+        <div class="flex flex-col justify-center items-center w-8 h-8">
+          <i data-lucide="arrow-left" class="w-5 h-5 text-black"></i>
+        </div>
+        <span class="text-xs font-mono tracking-widest uppercase hidden sm:inline-block">VOLVER</span>
+      </a>
+    </div>
+
+    <!-- LOGO CENTRAL -->
+    <div class="text-center">
+      <a href="index.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
+        BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
+      </a>
+    </div>
+
+    <!-- USUARIO Y CARRITO -->
+    <div class="flex items-center gap-3 md:gap-5">
+      <div class="relative hidden sm:flex items-center">
+        <input type="text" placeholder="Buscar libros..." class="w-40 lg:w-56 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
+        <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 text-black"></i>
+      </div>
+      <div class="relative p-1.5 rounded-full" aria-label="Carrito">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+        <span id="navCartCount" class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-mono w-4 h-4 rounded-full flex items-center justify-center transition-all">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL (TIENDA Y CARRITO)
+  =========================================== -->
+  <main class="flex-1 pt-24 pb-12 px-4 md:px-8 max-w-[1500px] mx-auto w-full flex flex-col lg:flex-row gap-8">
+    
+    <!-- SECCIÓN IZQUIERDA: CATÁLOGO DE PRODUCTOS -->
+    <section class="flex-1">
+      
+      <!-- Cabecera de Tienda -->
+      <div class="mb-8 border-b border-black pb-6">
+        <div class="inline-block px-2.5 py-1 bg-black text-white text-[10px] font-mono tracking-widest uppercase mb-4">
+          Catálogo Oficial
+        </div>
+        <h1 class="font-archivo text-6xl md:text-8xl tracking-tighter leading-none uppercase">SHOP</h1>
+      </div>
+
+      <!-- Filtros / Categorías -->
+      <nav class="flex gap-2 overflow-x-auto no-scrollbar pb-6 mb-2 border-b border-black/10" aria-label="Categorías">
+        <button class="bg-black text-white px-4 py-2 rounded-full text-xs font-mono tracking-wide whitespace-nowrap">game</button>
+        <button class="bg-white border border-black hover:bg-black hover:text-white px-4 py-2 rounded-full text-xs font-mono tracking-wide whitespace-nowrap transition-colors">movies</button>
+        <button class="bg-white border border-black hover:bg-black hover:text-white px-4 py-2 rounded-full text-xs font-mono tracking-wide whitespace-nowrap transition-colors">colores</button>
+        <button class="bg-white border border-black hover:bg-black hover:text-white px-4 py-2 rounded-full text-xs font-mono tracking-wide whitespace-nowrap transition-colors">personalizables</button>
+        <button class="bg-white border border-black hover:bg-black hover:text-white px-4 py-2 rounded-full text-xs font-mono tracking-wide whitespace-nowrap transition-colors">deportes</button>
+        <button class="bg-white border border-black hover:bg-black hover:text-white px-4 py-2 rounded-full text-xs font-mono tracking-wide whitespace-nowrap transition-colors">escuela</button>
+      </nav>
+
+      <!-- Grid de Productos (Renderizado por JS) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pt-6" id="products">
+        <!-- Los productos se inyectan aquí -->
+      </div>
+    </section>
+
+    <!-- SECCIÓN DERECHA: CARRITO -->
+    <aside class="w-full lg:w-[350px] xl:w-[400px] shrink-0">
+      <div class="bg-white border border-black sticky top-28 flex flex-col h-[calc(100vh-140px)] shadow-xl">
+        
+        <!-- Cabecera Carrito -->
+        <div class="p-5 border-b border-black flex justify-between items-center bg-[#f9f9f9]">
+          <h2 class="font-archivo text-2xl uppercase tracking-tighter m-0">Mi Carrito</h2>
+          <span class="font-mono text-[10px] bg-black text-white px-2 py-1 uppercase tracking-widest" id="count">0 ITEMS</span>
+        </div>
+
+        <!-- Lista de Items en Carrito -->
+        <div class="flex-1 overflow-y-auto p-5" id="items">
+          <!-- Los items se inyectan aquí -->
+          <div class="text-center text-neutral-500 py-12 font-mono text-xs uppercase tracking-widest flex flex-col items-center gap-3">
+            <i data-lucide="shopping-bag" class="w-8 h-8 opacity-20"></i>
+            Tu carrito está vacío.<br>Añade un libro para comenzar.
+          </div>
+        </div>
+
+        <!-- Resumen y Pago -->
+        <div class="p-5 border-t border-black bg-[#f9f9f9]">
+          <div class="space-y-3 mb-6">
+            <div class="flex justify-between text-xs font-mono text-neutral-600">
+              <span>Subtotal</span>
+              <b id="subtotal" class="text-black">$0.00</b>
+            </div>
+            <div class="flex justify-between text-xs font-mono text-neutral-600">
+              <span>Impuestos (16%)</span>
+              <b id="tax" class="text-black">$0.00</b>
+            </div>
+            <div class="flex justify-between pt-3 border-t border-black/20 text-base font-bold font-syne">
+              <span>Total</span>
+              <b id="total">$0.00</b>
+            </div>
+          </div>
+          
+          <button class="w-full bg-black text-white hover:bg-neutral-800 py-4 font-mono text-xs uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-2" onclick="alert('Iniciando proceso de pago...')">
+            <i data-lucide="credit-card" class="w-4 h-4"></i>
+            Proceed to Checkout
+          </button>
+          
+          <a href="index.html" class="block text-center mt-4 font-mono text-[10px] uppercase tracking-widest text-neutral-500 hover:text-black underline underline-offset-4">
+            Seguir comprando
+          </a>
+        </div>
+
+      </div>
+    </aside>
+
+  </main>
+
+  <script>
+    // Inicializar iconos
+    lucide.createIcons();
+
+    // Datos originales
+    const products = [
+      ['PIXEL QUEST', 'Una aventura visual entre mundos digitales.', '$12.00', '#d7ff35'],
+      ['LEVEL ZERO', 'Manual para perderse y volver a jugar.', '$15.00', '#ff704f'],
+      ['NIGHT ARCADE', 'Historias cortas desde la última máquina.', '$9.00', '#a78bfa'],
+      ['PLAYER TWO', 'La guía secreta para nuevas partidas.', '$18.00', '#65e6d0'],
+      ['CINEMA DIARY', 'Anota cada plano de tu vida.', '$20.00', '#1a1a1a'],
+      ['FOOD LOG', 'Recetas y desastres culinarios.', '$14.00', '#f59e0b']
+    ];
+    let cart = [];
+
+    // Renderizar Productos
+    const productBox = document.getElementById('products');
+    products.forEach((p, i) => {
+      // Color de texto adaptativo según el fondo del libro
+      const textColor = p[3] === '#1a1a1a' ? 'text-white' : 'text-black/80';
+      
+      productBox.innerHTML += `
+        <article class="bg-white border border-black p-4 flex flex-col group hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl">
+          <!-- Portada 3D Interactiva -->
+          <div id="book-container-${i}" class="h-48 mb-4 relative overflow-hidden flex items-center justify-center border border-black/10 bg-grid-pattern cursor-grab active:cursor-grabbing">
+            <!-- Canvas para Three.js -->
+            <canvas id="canvas-${i}" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+            
+            <!-- Texto flotante sobre el Canvas (Pointer-events-none para dejar pasar los clics al canvas) -->
+            <b class="font-archivo text-2xl text-center transform -rotate-3 z-10 px-4 max-w-[80%] leading-none pointer-events-none ${textColor}" style="text-shadow: 0px 4px 14px rgba(0,0,0,0.15);">${p[0]}</b>
+          </div>
+          
+          <!-- Info -->
+          <div class="flex-1 flex flex-col z-10 bg-white">
+            <h3 class="font-syne font-bold text-lg leading-tight mb-1">${p[0]}</h3>
+            <p class="font-mono text-xs text-neutral-500 mb-4 line-clamp-2">${p[1]}</p>
+            
+            <div class="mt-auto pt-3 border-t border-black/10 flex items-center justify-between">
+              <span class="font-bold text-lg">${p[2]}</span>
+              <button class="bg-white border border-black text-black hover:bg-black hover:text-white px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-1" onclick="add(${i})">
+                <i data-lucide="plus" class="w-3 h-3"></i> Añadir
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    });
+    
+    // Volver a procesar iconos creados dinámicamente
+    lucide.createIcons();
+
+    /* ==========================================
+       LÓGICA DEL CARRITO
+    =========================================== */
+    function add(i) {
+      cart.push(i);
+      render();
+    }
+    
+    function remove(i) {
+      cart.splice(i, 1);
+      render();
+    }
+    
+    function render() {
+      let total = 0;
+      const box = document.getElementById('items');
+      const countText = `${cart.length} ITEM${cart.length === 1 ? '' : 'S'}`;
+      
+      document.getElementById('count').textContent = countText;
+      document.getElementById('navCartCount').textContent = cart.length;
+
+      if (!cart.length) {
+        box.innerHTML = `
+          <div class="text-center text-neutral-500 py-12 font-mono text-xs uppercase tracking-widest flex flex-col items-center gap-3">
+            <svg class="w-8 h-8 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Tu carrito está vacío.<br>Añade un libro para comenzar.
+          </div>`;
+      } else {
+        box.innerHTML = cart.map((id, n) => {
+          const p = products[id];
+          const price = parseFloat(p[2].slice(1));
+          total += price;
+          const textColor = p[3] === '#1a1a1a' ? 'text-white' : 'text-black/80';
+          
+          return `
+            <div class="flex gap-4 py-4 border-b border-black/10 last:border-0 items-center">
+              <!-- Mini cover (Mantenemos como CSS estático por optimización) -->
+              <div class="w-14 h-20 flex-shrink-0 flex items-center justify-center p-1 border border-black/20" style="background-color: ${p[3]}">
+                <span class="font-archivo text-[7px] text-center leading-tight ${textColor}">${p[0]}</span>
+              </div>
+              
+              <!-- Detalles -->
+              <div class="flex-1 flex flex-col justify-center">
+                <div class="font-syne font-bold text-sm leading-tight">${p[0]}</div>
+                <div class="font-mono text-[9px] text-neutral-500 uppercase tracking-widest mt-1 mb-2">Edición PDF / EPUB</div>
+                
+                <div class="flex justify-between items-center mt-auto">
+                  <div class="flex items-center gap-3 text-neutral-500 bg-neutral-100 rounded px-2 py-0.5 border border-black/5">
+                    <button onclick="remove(${n})" class="hover:text-black font-mono text-lg leading-none">−</button>
+                    <span class="font-mono text-xs text-black">1</span>
+                    <button onclick="add(${id})" class="hover:text-black font-mono text-lg leading-none">+</button>
+                  </div>
+                  <b class="text-sm">${p[2]}</b>
+                </div>
+              </div>
+              
+              <!-- Eliminar -->
+              <button class="text-neutral-400 hover:text-black p-1 transition-colors" aria-label="Eliminar" onclick="remove(${n})">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      const tax = total * 0.16;
+      document.getElementById('subtotal').textContent = `$${total.toFixed(2)}`;
+      document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+      document.getElementById('total').textContent = `$${(total + tax).toFixed(2)}`;
+    }
+    
+    // Render inicial carrito
+    render();
+
+    /* ==========================================
+       LÓGICA THREE.JS PARA CATÁLOGO (Múltiples Libros)
+    =========================================== */
+    const books3D = [];
+
+    function init3DBooks() {
+      products.forEach((p, i) => {
+        const container = document.getElementById(`book-container-${i}`);
+        const canvas = document.getElementById(`canvas-${i}`);
+        
+        // Evitamos errores si el elemento no se encuentra
+        if (!container || !canvas) return;
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        // Escena y Cámara
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 7.5);
+
+        // Renderizador con transparencia para mantener el patrón de fondo de Tailwind
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Luces
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+
+        // Geometría del libro
+        const bookWidth = 2.4;
+        const bookHeight = 3.2;
+        const bookDepth = 0.5;
+        const geometry = new THREE.BoxGeometry(bookWidth, bookHeight, bookDepth);
+        
+        const coverColor = p[3]; 
+
+        // Materiales
+        const materials = [
+          new THREE.MeshStandardMaterial({ color: 0x111111 }), // Derecha
+          new THREE.MeshStandardMaterial({ color: 0x111111 }), // Izquierda
+          new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }), // Arriba
+          new THREE.MeshStandardMaterial({ color: 0xf0f0f0 }), // Abajo
+          new THREE.MeshStandardMaterial({ color: coverColor, roughness: 0.2 }), // Frente
+          new THREE.MeshStandardMaterial({ color: coverColor, roughness: 0.2 })  // Atrás
+        ];
+
+        const bookMesh = new THREE.Mesh(geometry, materials);
+        
+        // Rotación inicial ligeramente variable para que se vean más orgánicos
+        bookMesh.rotation.y = -0.4 + (i * 0.1);
+        bookMesh.rotation.x = 0.2;
+        scene.add(bookMesh);
+
+        const bookData = { scene, camera, renderer, mesh: bookMesh, isDragging: false };
+        books3D.push(bookData);
+
+        // === Eventos de interacción con el Mouse ===
+        container.addEventListener('mousedown', () => { bookData.isDragging = true; });
+        container.addEventListener('mousemove', (e) => {
+          if (bookData.isDragging) {
+            bookMesh.rotation.y += e.movementX * 0.01;
+            bookMesh.rotation.x += e.movementY * 0.01;
+          }
+        });
+
+        // === Eventos de interacción Táctil (Móvil) ===
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        
+        container.addEventListener('touchstart', (e) => { 
+          bookData.isDragging = true; 
+          lastTouchX = e.touches[0].clientX;
+          lastTouchY = e.touches[0].clientY;
+          // Prevenimos el scroll de la página si estamos manipulando el libro
+          if(e.cancelable) e.preventDefault(); 
+        }, { passive: false });
+        
+        container.addEventListener('touchmove', (e) => {
+          if (bookData.isDragging) {
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const deltaX = currentX - lastTouchX;
+            const deltaY = currentY - lastTouchY;
+            
+            bookMesh.rotation.y += deltaX * 0.01;
+            bookMesh.rotation.x += deltaY * 0.01;
+            
+            lastTouchX = currentX;
+            lastTouchY = currentY;
+            
+            if(e.cancelable) e.preventDefault(); 
+          }
+        }, { passive: false });
+
+        window.addEventListener('mouseup', () => { bookData.isDragging = false; });
+        window.addEventListener('touchend', () => { bookData.isDragging = false; });
+        container.addEventListener('mouseleave', () => { bookData.isDragging = false; });
+      });
+
+      animateBooks();
+    }
+
+    // Bucle de renderizado para todos los libros
+    function animateBooks() {
+      requestAnimationFrame(animateBooks);
+      books3D.forEach(book => {
+        if (!book.isDragging) {
+          book.mesh.rotation.y += 0.005; // Rotación automática constante
+        }
+        book.renderer.render(book.scene, book.camera);
+      });
+    }
+
+    // Adaptar Canvas al cambiar tamaño de la ventana
+    window.addEventListener('resize', () => {
+      books3D.forEach((book, i) => {
+        const container = document.getElementById(`book-container-${i}`);
+        if(container) {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            book.camera.aspect = width / height;
+            book.camera.updateProjectionMatrix();
+            book.renderer.setSize(width, height);
+        }
+      });
+    });
+
+    // Iniciar Three.js una vez el DOM ha cargado y el código JS anterior ha inyectado los contenedores
+    window.onload = init3DBooks;
+
+  </script>
+</body>
+</html>
