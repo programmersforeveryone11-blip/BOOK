@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOK - Santuario del Graffiti</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+    body { min-height: 100vh; background: #0f0f11 url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/huhu.jpg-Q9dk94t2yqheRAyhj0ksdmNx0848jB.png') center / cover fixed no-repeat; color: #fff; padding: 28px; position: relative; }
+    body::before { content: ''; position: fixed; inset: 0; background: rgba(15,15,17,.78); z-index: -1; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,.22); padding-bottom: 18px; }
+    h1, h2, h3 { letter-spacing: .04em; }
+    a { color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: .78rem; letter-spacing: .08em; }
+    
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+    .zone-card { background: rgba(30,30,36,.9); border: 1px solid rgba(255,255,255,.22); border-radius: 2px; padding: 18px; text-align: center; backdrop-filter: blur(6px); }
+    .zone-card h3 { margin-bottom: 10px; color: #f3f4f6; }
+    .zone-card .badge { display: inline-block; padding: 4px 8px; background: #374151; border-radius: 12px; font-size: 0.8rem; margin-bottom: 12px; }
+    
+    button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+    button:disabled { background: #4b5563; cursor: not-allowed; }
+    button.leave { background: #ef4444; }
+
+    /* Modal / Canvas de Dibujo */
+    #canvasView { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; flex-direction: column; }
+    .canvas-tools { background: #18181b; padding: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    canvas { flex: 1; background: #111; cursor: crosshair; touch-action: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Santuario de Graffiti</h1>
+    <a href="index.html">← Volver al Inicio</a>
+  </header>
+
+  <section id="lobbyView">
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <input type="text" id="zoneNameInput" placeholder="Nombre de nueva zona..." style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; flex: 1;">
+      <button id="createZoneBtn" style="width: auto;">Crear Zona (Máx 20)</button>
+    </div>
+
+    <h2>Zonas Disponibles</h2>
+    <div id="zonesGrid" class="grid-container">Cargando zonas...</div>
+  </section>
+
+  <!-- Pantalla de Dibujo -->
+  <div id="canvasView">
+    <div class="canvas-tools">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button id="exitZoneBtn" class="leave" style="width: auto;">Salir de la Zona</button>
+        <span id="currentZoneTitle">Zona</span>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <label>Color: <input type="color" id="brushColor" value="#ff0055"></label>
+        <label>Grosor: <input type="range" id="brushSize" min="2" max="30" value="5"></label>
+        <button id="clearCanvasBtn" style="width: auto; background: #555;">Limpiar Mío</button>
+      </div>
+    </div>
+    <canvas id="graffitiCanvas"></canvas>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
+  
+  // Reutilizamos la anon key existente o tu cliente global
+  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // <--- Pega aquí tu clave anon real de Supabase si la tienes guardada en tu proyecto
+  
+  // Si en tu proyecto ya tienes configurado 'supabaseClient' en window, lo reutiliza:
+  const supabaseClient = window.supabaseClient || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let activeZoneId = null;
+  let isDrawing = false;
+  let ctx, canvas;
+
+  async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      alert("Debes iniciar sesión para ingresar al Santuario");
+      window.location.href = 'index.html';
+      return;
+    }
+    currentUser = session.user;
+    setupCanvas();
+    loadZones();
+  }
+
+  async function loadZones() {
+    const { data: zones } = await supabaseClient.from('graffiti_zones').select('*, zone_members(user_id)');
+    const grid = document.getElementById('zonesGrid');
+    grid.innerHTML = '';
+
+    if (!zones || zones.length === 0) {
+      grid.innerHTML = '<p>No hay zonas creadas aún. ¡Crea la primera!</p>';
+      return;
+    }
+
+    zones.forEach(zone => {
+      const memberCount = zone.zone_members ? zone.zone_members.length : 0;
+      const isMember = zone.zone_members.some(m => m.user_id === currentUser.id);
+      
+      const card = document.createElement('div');
+      card.className = 'zone-card';
+      card.innerHTML = `
+        <h3>${zone.name}</h3>
+        <span class="badge">${memberCount} / 10 Personas</span>
+        ${isMember 
+          ? `<button onclick="enterZone('${zone.id}', '${zone.name}')">Entrar a Dibujar</button>`
+          : memberCount >= 10 
+            ? `<button disabled>Zona Llena</button>` 
+            : `<button onclick="joinZone('${zone.id}')">Unirse y Dibujar</button>`}
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById('createZoneBtn').addEventListener('click', async () => {
+    const { data: currentZones } = await supabaseClient.from('graffiti_zones').select('id');
+    if (currentZones && currentZones.length >= 20) {
+      alert("Se ha alcanzado el límite máximo de 20 zonas activas.");
+      return;
+    }
+
+    const name = document.getElementById('zoneNameInput').value.trim();
+    if (!name) return alert("Escribe un nombre para la zona");
+
+    const { data, error } = await supabaseClient.from('graffiti_zones').insert([{ name, created_by: currentUser.id }]).select().single();
+    if (!error) {
+      await joinZone(data.id);
+      document.getElementById('zoneNameInput').value = '';
+    }
+  });
+
+  async function joinZone(zoneId) {
+    await supabaseClient.from('zone_members').insert([{ zone_id: zoneId, user_id: currentUser.id }]);
+    const { data: zone } = await supabaseClient.from('graffiti_zones').select('name').eq('id', zoneId).single();
+    enterZone(zoneId, zone.name);
+  }
+
+  function enterZone(zoneId, zoneName) {
+    activeZoneId = zoneId;
+    document.getElementById('currentZoneTitle').textContent = `Zona: ${zoneName}`;
+    document.getElementById('canvasView').style.display = 'flex';
+    resizeCanvas();
+    loadStrokes();
+  }
+
+  document.getElementById('exitZoneBtn').addEventListener('click', async () => {
+    document.getElementById('canvasView').style.display = 'none';
+    activeZoneId = null;
+    loadZones();
+  });
+
+  // --- LÓGICA DE DIBUJO ---
+  function setupCanvas() {
+    canvas = document.getElementById('graffitiCanvas');
+    ctx = canvas.getContext('2d');
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight - 50;
+  }
+
+  let currentStroke = [];
+
+  function startDrawing(e) {
+    isDrawing = true;
+    currentStroke = [];
+    addPoint(e);
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    addPoint(e);
+    renderStroke(currentStroke);
+  }
+
+  function addPoint(e) {
+    const rect = canvas.getBoundingClientRect();
+    currentStroke.push({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      color: document.getElementById('brushColor').value,
+      size: document.getElementById('brushSize').value
+    });
+  }
+
+  async function stopDrawing() {
+    if (!isDrawing) return;
+    isDrawing = false;
+    if (currentStroke.length > 0 && activeZoneId) {
+      await supabaseClient.from('graffiti_strokes').insert([{
+        zone_id: activeZoneId,
+        user_id: currentUser.id,
+        stroke_data: currentStroke
+      }]);
+    }
+  }
+
+  function renderStroke(points) {
+    if (points.length < 2) return;
+    ctx.beginPath();
+    ctx.strokeStyle = points[0].color;
+    ctx.lineWidth = points[0].size;
+    ctx.lineCap = 'round';
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+  }
+
+  async function loadStrokes() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const { data: strokes } = await supabaseClient.from('graffiti_strokes').select('stroke_data').eq('zone_id', activeZoneId);
+    if (strokes) {
+      strokes.forEach(s => renderStroke(s.stroke_data));
+    }
+  }
+
+  window.onload = init;
+</script>
+</body>
+</html>
