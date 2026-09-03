@@ -55,7 +55,6 @@
       <div style="display: flex; gap: 10px; align-items: center;">
         <label>Color: <input type="color" id="brushColor" value="#ff0055"></label>
         <label>Grosor: <input type="range" id="brushSize" min="2" max="30" value="5"></label>
-        <button id="clearCanvasBtn" style="width: auto; background: #555;">Limpiar Mío</button>
       </div>
     </div>
     <canvas id="graffitiCanvas"></canvas>
@@ -63,12 +62,9 @@
 
 <script>
   const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
-  
-  // Reutilizamos la anon key existente o tu cliente global
-  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // <--- Pega aquí tu clave anon real de Supabase si la tienes guardada en tu proyecto
-  
-  // Si en tu proyecto ya tienes configurado 'supabaseClient' en window, lo reutiliza:
-  const supabaseClient = window.supabaseClient || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Aquí ya colocamos tu clave exacta:
+  const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo'; 
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentUser = null;
   let activeZoneId = null;
@@ -76,19 +72,29 @@
   let ctx, canvas;
 
   async function init() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-      alert("Debes iniciar sesión para ingresar al Santuario");
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (error || !session) {
+      alert("Debes iniciar sesión primero en la aplicación.");
       window.location.href = 'index.html';
       return;
     }
+    
     currentUser = session.user;
     setupCanvas();
     loadZones();
   }
 
   async function loadZones() {
-    const { data: zones } = await supabaseClient.from('graffiti_zones').select('*, zone_members(user_id)');
+    const { data: zones, error } = await supabaseClient
+      .from('graffiti_zones')
+      .select('*, zone_members(user_id)');
+      
+    if (error) {
+      console.error("Error al cargar zonas:", error.message);
+      return;
+    }
+
     const grid = document.getElementById('zonesGrid');
     grid.innerHTML = '';
 
@@ -117,17 +123,25 @@
   }
 
   document.getElementById('createZoneBtn').addEventListener('click', async () => {
+    const name = document.getElementById('zoneNameInput').value.trim();
+    if (!name) return alert("Escribe un nombre para la zona");
+
     const { data: currentZones } = await supabaseClient.from('graffiti_zones').select('id');
     if (currentZones && currentZones.length >= 20) {
       alert("Se ha alcanzado el límite máximo de 20 zonas activas.");
       return;
     }
 
-    const name = document.getElementById('zoneNameInput').value.trim();
-    if (!name) return alert("Escribe un nombre para la zona");
+    const { data, error } = await supabaseClient
+      .from('graffiti_zones')
+      .insert([{ name: name, created_by: currentUser.id }])
+      .select()
+      .single();
 
-    const { data, error } = await supabaseClient.from('graffiti_zones').insert([{ name, created_by: currentUser.id }]).select().single();
-    if (!error) {
+    if (error) {
+      console.error("Error al crear zona:", error.message);
+      alert("Error al crear zona: " + error.message);
+    } else {
       await joinZone(data.id);
       document.getElementById('zoneNameInput').value = '';
     }
@@ -136,7 +150,7 @@
   async function joinZone(zoneId) {
     await supabaseClient.from('zone_members').insert([{ zone_id: zoneId, user_id: currentUser.id }]);
     const { data: zone } = await supabaseClient.from('graffiti_zones').select('name').eq('id', zoneId).single();
-    enterZone(zoneId, zone.name);
+    if (zone) enterZone(zoneId, zone.name);
   }
 
   function enterZone(zoneId, zoneName) {
