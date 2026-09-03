@@ -2,432 +2,411 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mi Perfil — BOOK</title>
-  <link rel="icon" type="image/png" href="films1.png" />
-
-  <!-- Tailwind CSS -->
+  <link rel="icon" href="films1.png" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
-
-  <!-- Lucide Icons & Supabase JS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['Space Grotesk', 'monospace'],
-            syne: ['Syne', 'sans-serif'],
-            archivo: ['Archivo Black', 'sans-serif'],
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     .bg-grid-pattern {
       background-color: #f7f7f8;
       background-image:
-        linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.08) 1px, transparent 1px),
-        linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px);
-      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
-    }
-    .side-menu-drawer {
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px);
+      background-size: 20px 20px;
     }
   </style>
 </head>
-<body class="bg-grid-pattern text-black font-sans antialiased selection:bg-black selection:text-white min-h-screen flex flex-col justify-between">
+<body class="bg-grid-pattern font-sans min-h-screen text-black">
 
-  <!-- TOP NAV (MISMO QUE INDEX.HTML) -->
-  <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-black/10 px-4 md:px-8 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <button id="menuBtn" onclick="toggleMenu()" class="group w-8 h-8 flex flex-col justify-center gap-1.5 items-center">
-        <span class="block w-6 h-[2px] bg-black"></span>
-        <span class="block w-6 h-[2px] bg-black"></span>
-      </button>
-      <span class="text-xs font-mono tracking-widest uppercase hidden sm:inline-block">MENÚ</span>
-    </div>
-
-    <div class="text-center">
-      <a href="index.html" class="font-archivo text-2xl tracking-tighter uppercase inline-block">
-        BOOK <span class="text-[10px] font-mono tracking-widest text-neutral-500 block -mt-2">LUIZABETH'S</span>
-      </a>
-    </div>
-
-    <div class="flex items-center gap-3 md:gap-5">
-      <div id="userHeaderEmail" class="hidden md:block font-mono text-[11px] uppercase text-neutral-500 bg-neutral-100 px-3 py-1 rounded-full border border-black/5"></div>
-      
-      <a href="index.html" class="flex items-center gap-2 bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all">
-        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-        <span>INICIO</span>
-      </a>
-
-      <a href="tienda.html" class="relative p-1.5 hover:bg-black/5 rounded-full">
-        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-        <span class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-mono w-4 h-4 rounded-full flex items-center justify-center">0</span>
-      </a>
+  <header class="w-full bg-white/90 p-4 border-b">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="font-archivo text-lg uppercase">← VOLVER A BOOK</a>
+      <div id="userHeaderEmail" class="text-xs text-neutral-600"></div>
     </div>
   </header>
 
-  <!-- SIDE MENU -->
-  <div id="sideMenu" class="fixed top-0 left-0 w-full sm:w-[380px] h-full bg-black text-white z-40 transform -translate-x-full side-menu-drawer pt-24 px-8 pb-10 flex flex-col justify-between shadow-2xl">
-    <div>
-      <div class="flex items-center justify-between border-b border-white/20 pb-4 mb-6">
-        <span class="text-xs font-mono text-neutral-400 uppercase tracking-widest">Navegación</span>
-        <button onclick="toggleMenu()" class="text-xs font-mono text-neutral-400 hover:text-white flex items-center gap-1">
-          <i data-lucide="x" class="w-4 h-4"></i> CERRAR
-        </button>
-      </div>
-      <nav class="space-y-4">
-        <a href="index.html" class="group flex items-center justify-between text-2xl font-bold">Inicio</a>
-        <a href="users.html" class="group flex items-center justify-between text-2xl font-bold text-neutral-400">Ajustes / Perfil</a>
-        <a href="tienda.html" class="group flex items-center justify-between text-2xl font-bold">Tienda</a>
-        <a href="comunidad.html" class="group flex items-center justify-between text-2xl font-bold">Comunidad</a>
-      </nav>
-    </div>
-    <div class="border-t border-white/20 pt-6 mt-6 text-xs font-mono text-neutral-400">BOOK — Libros digitales</div>
-  </div>
-  <div id="menuOverlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/60 z-30 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-
-  <!-- CONTENT CONTAINER -->
-  <main class="pt-28 pb-16 px-4 md:px-8 max-w-6xl mx-auto w-full flex-grow">
-    
-    <!-- HEADER TITULAR -->
-    <div class="mb-8 border-b border-black/10 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div>
-        <div class="inline-block px-2.5 py-1 bg-black text-white text-[10px] font-mono tracking-widest uppercase mb-2">
-          [ PANEL DE USUARIO ]
-        </div>
-        <h1 class="font-archivo text-4xl md:text-6xl uppercase tracking-tight">Mi Perfil</h1>
-      </div>
-      <div class="font-mono text-xs text-neutral-500 uppercase tracking-wider">
-        Gestiona tu cuenta y referencias
-      </div>
-    </div>
-
-    <!-- MAIN PROFILE CARD -->
-    <div class="bg-white border border-black/10 rounded-2xl p-6 md:p-8 shadow-xl">
-      
-      <!-- USER AVATAR & QUICK INFOS -->
-      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-black/10 pb-8">
-        
-        <div id="profileAvatarContainer" class="relative w-28 h-28 rounded-full bg-black text-white flex items-center justify-center text-4xl font-archivo overflow-hidden border-2 border-black shrink-0 shadow-inner">
+  <main class="max-w-4xl mx-auto p-6">
+    <div class="bg-white border rounded-2xl p-6 shadow">
+      <div class="flex items-center gap-6 border-b pb-6">
+        <div id="profileAvatarContainer" class="w-28 h-28 rounded-full bg-black text-white flex items-center justify-center text-3xl overflow-hidden border-2 relative">
           <img id="profileAvatarImg" src="" alt="" class="w-full h-full object-cover hidden">
-          <span id="profileInitial">U</span>
+          <span id="profileInitial" class="font-bold">U</span>
         </div>
 
-        <div class="flex-1 text-center sm:text-left">
-          <span class="text-[10px] font-mono uppercase text-neutral-500 tracking-widest bg-neutral-100 px-2.5 py-1 rounded">
-            Cuenta Activa
-          </span>
-          <h2 id="profileNameTitle" class="font-archivo text-3xl uppercase tracking-tight mt-2">Cargando...</h2>
-          <p id="profileEmailSubtitle" class="font-mono text-xs text-neutral-500 mt-1"></p>
+        <div class="flex-1">
+          <div class="text-xs uppercase text-neutral-500 tracking-widest">Panel de Usuario</div>
+          <h1 id="profileNameTitle" class="text-2xl font-bold mt-1">Cargando...</h1>
+          <div id="profileEmailSubtitle" class="text-xs text-neutral-500 mt-1"></div>
         </div>
 
-        <div class="flex flex-wrap sm:flex-col gap-2 justify-center w-full sm:w-auto">
-          <button id="editProfileBtn" class="flex-1 sm:flex-initial px-4 py-2.5 bg-black text-white text-xs font-mono uppercase tracking-wider rounded-lg hover:bg-neutral-800 transition-all flex items-center justify-center gap-2">
-            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-            <span>Editar Perfil</span>
-          </button>
-          <button id="logoutBtnSmall" onclick="logoutSession()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 text-xs font-mono uppercase tracking-wider rounded-lg hover:bg-red-100 transition-all flex items-center justify-center gap-2">
-            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-            <span>Cerrar sesión</span>
-          </button>
+        <div class="text-right">
+          <button id="editProfileBtn" class="px-3 py-2 bg-black text-white rounded">Editar Perfil</button>
+          <button id="logoutBtnSmall" onclick="logoutSession()" class="px-3 py-2 ml-2 bg-red-100 text-red-700 rounded">Cerrar sesión</button>
         </div>
       </div>
 
-      <!-- MAIN DISPLAY / FORM SECTION -->
-      <div id="profileContent" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- LEFT: USER DETAILS CARD -->
-        <div class="bg-[#f7f7f8] border border-black/5 rounded-xl p-5 space-y-4">
-          <div class="flex items-center gap-2 border-b border-black/10 pb-2 mb-4">
-            <i data-lucide="user-check" class="w-4 h-4 text-neutral-600"></i>
-            <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-neutral-700">Información Personal</h3>
-          </div>
+      <div id="profileContent" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-[10px] uppercase font-mono text-neutral-500">Nombre completo</label>
+          <div id="displayName" class="mt-1 text-sm font-bold">-</div>
 
-          <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-400 block tracking-wider">Nombre Completo</label>
-            <div id="displayName" class="mt-1 font-mono text-sm font-semibold text-black">-</div>
-          </div>
+          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">Edad</label>
+          <div id="displayAge" class="mt-1">-</div>
 
-          <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-400 block tracking-wider">Edad</label>
-            <div id="displayAge" class="mt-1 font-mono text-sm font-semibold text-black">-</div>
-          </div>
+          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">Categoría / Gusto favorito</label>
+          <div id="displayTaste" class="mt-1 uppercase">-</div>
 
-          <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-400 block tracking-wider">Categoría / Gusto Favorito</label>
-            <div id="displayTaste" class="mt-1 inline-block px-2.5 py-1 bg-black text-white font-mono text-xs uppercase tracking-wider rounded">
-              -
-            </div>
-          </div>
-
-          <div class="pt-2">
-            <label class="text-[10px] font-mono uppercase text-neutral-400 block tracking-wider">ID de Usuario (Supabase)</label>
-            <div id="displayId" class="mt-1 font-mono text-[11px] text-neutral-600 break-all bg-white p-2 rounded border border-black/10">
-              -
-            </div>
-          </div>
+          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">ID (Supabase)</label>
+          <div id="displayId" class="mt-1 text-xs text-neutral-600 break-all">-</div>
         </div>
 
-        <!-- RIGHT: SETTINGS & COMMUNITY -->
-        <div class="space-y-6">
-          
-          <!-- PASSWORD & AVATAR EDIT -->
-          <div class="bg-[#f7f7f8] border border-black/5 rounded-xl p-5 space-y-4">
-            <div class="flex items-center gap-2 border-b border-black/10 pb-2 mb-2">
-              <i data-lucide="shield-check" class="w-4 h-4 text-neutral-600"></i>
-              <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-neutral-700">Seguridad & Multimedia</h3>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-mono uppercase text-neutral-500 mb-1 block">Cambiar Contraseña</label>
-              <div class="flex items-center gap-2">
-                <input id="newPassword" type="password" placeholder="••••••••" class="flex-1 px-3 py-2 border border-black/20 focus:border-black rounded-lg text-xs font-mono bg-white outline-none" />
-                <button id="changePasswordBtn" class="px-3 py-2 bg-black text-white text-xs font-mono uppercase rounded-lg hover:bg-neutral-800 transition-all">
-                  Cambiar
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-mono uppercase text-neutral-500 mb-1 block">Foto de Perfil</label>
-              <div class="flex items-center gap-2">
-                <input id="avatarFile" type="file" accept="image/*" class="flex-1 text-xs font-mono file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-mono file:bg-neutral-200 file:text-black hover:file:bg-neutral-300" />
-                <button id="uploadAvatarBtn" class="px-3 py-2 bg-black text-white text-xs font-mono uppercase rounded-lg hover:bg-neutral-800 transition-all">
-                  Subir
-                </button>
-              </div>
-            </div>
+        <div>
+          <label class="text-[10px] uppercase font-mono text-neutral-500">Contraseña</label>
+          <div class="mt-1 flex items-center gap-2">
+            <input id="newPassword" type="password" placeholder="Nueva contraseña" class="flex-1 px-3 py-2 border rounded" />
+            <button id="changePasswordBtn" class="px-3 py-2 bg-black text-white rounded">Cambiar</button>
           </div>
 
-          <!-- STATS & COMMUNITY -->
-          <div class="bg-black text-white rounded-xl p-5 shadow-lg">
-            <div class="flex items-center justify-between border-b border-white/20 pb-3 mb-4">
-              <span class="font-mono text-xs uppercase tracking-widest text-neutral-400">Estadísticas de Libro</span>
-              <i data-lucide="award" class="w-4 h-4 text-yellow-400"></i>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 text-center mb-5">
-              <div class="bg-white/10 rounded-lg p-3 border border-white/10">
-                <div class="text-[10px] font-mono uppercase text-neutral-400">Seguidores</div>
-                <div id="followersCount" class="font-archivo text-3xl mt-1">0</div>
-              </div>
-              <div class="bg-white/10 rounded-lg p-3 border border-white/10">
-                <div class="text-[10px] font-mono uppercase text-neutral-400">Estrellas</div>
-                <div id="starsCount" class="font-archivo text-3xl mt-1 text-yellow-400">0</div>
-              </div>
-            </div>
-
-            <div class="flex gap-2">
-              <button id="btnSimulateFollow" class="flex-1 py-2 bg-white text-black font-mono text-[11px] font-bold uppercase rounded-lg hover:bg-neutral-200 transition-all">
-                +1 Seguidor
-              </button>
-              <button id="btnAddStar" class="flex-1 py-2 bg-yellow-400 text-black font-mono text-[11px] font-bold uppercase rounded-lg hover:bg-yellow-300 transition-all">
-                +1 Estrella
-              </button>
-            </div>
-
-            <p id="backendNote" class="mt-4 text-[10px] font-mono text-neutral-400 leading-relaxed border-t border-white/10 pt-3">
-              * Para sincronizar tus seguidores en red global, configura la tabla <code class="text-white bg-white/20 px-1 rounded">profiles</code> en Supabase.
-            </p>
+          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">Foto de Perfil</label>
+          <div class="mt-1 flex items-center gap-2">
+            <input id="avatarFile" type="file" accept="image/*" class="text-xs" />
+            <button id="uploadAvatarBtn" class="px-3 py-2 bg-black text-white rounded">Subir</button>
           </div>
 
+          <div class="mt-6 border-t pt-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] uppercase text-neutral-500 font-mono">Seguidores</div>
+                <div id="followersCount" class="text-xl font-bold">0</div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase text-neutral-500 font-mono">Estrellas</div>
+                <div id="starsCount" class="text-xl font-bold">0</div>
+              </div>
+            </div>
+
+            <div id="otherProfileActions" class="mt-4 hidden">
+              <button id="btnFollow" class="px-3 py-2 bg-white border rounded">Seguir</button>
+              <button id="btnUnfollow" class="px-3 py-2 bg-white border rounded hidden">Dejar de seguir</button>
+              <button id="btnAddStar" class="px-3 py-2 bg-yellow-300 rounded ml-2">Añadir estrella</button>
+            </div>
+
+            <div id="backendNote" class="mt-3 text-xs text-neutral-500">
+              Nota: seguidores/estrellas usan la tabla "profiles" y "follows" si existen en Supabase; en caso contrario se usan campos en user_metadata (fallback).
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- EDIT FORM DRAWER / PANEL -->
-      <div id="editForm" class="mt-8 bg-[#f7f7f8] border border-black/20 p-6 rounded-xl hidden">
-        <div class="flex items-center gap-2 border-b border-black/10 pb-3 mb-4">
-          <i data-lucide="edit" class="w-4 h-4"></i>
-          <h3 class="font-archivo text-lg uppercase">Editar Datos del Perfil</h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div id="editForm" class="mt-6 bg-neutral-50 p-4 rounded hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-500 mb-1 block">Nombre</label>
-            <input id="editNombre" type="text" class="w-full px-3.5 py-2 border rounded-lg text-xs font-mono outline-none focus:border-black" />
+            <label class="text-[10px] uppercase text-neutral-500">Nombre</label>
+            <input id="editNombre" type="text" class="w-full px-3 py-2 border rounded" />
           </div>
           <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-500 mb-1 block">Apellido</label>
-            <input id="editApellido" type="text" class="w-full px-3.5 py-2 border rounded-lg text-xs font-mono outline-none focus:border-black" />
+            <label class="text-[10px] uppercase text-neutral-500">Apellido</label>
+            <input id="editApellido" type="text" class="w-full px-3 py-2 border rounded" />
           </div>
           <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-500 mb-1 block">Edad</label>
-            <input id="editEdad" type="number" min="10" max="120" class="w-full px-3.5 py-2 border rounded-lg text-xs font-mono outline-none focus:border-black" />
+            <label class="text-[10px] uppercase text-neutral-500">Edad</label>
+            <input id="editEdad" type="number" min="10" max="120" class="w-full px-3 py-2 border rounded" />
           </div>
           <div>
-            <label class="text-[10px] font-mono uppercase text-neutral-500 mb-1 block">Gustos / Categoría</label>
-            <input id="editGustos" type="text" placeholder="Movie, Sport, Game..." class="w-full px-3.5 py-2 border rounded-lg text-xs font-mono outline-none focus:border-black" />
+            <label class="text-[10px] uppercase text-neutral-500">Gustos / Categoría</label>
+            <input id="editGustos" type="text" class="w-full px-3 py-2 border rounded" />
           </div>
         </div>
 
-        <div class="mt-6 flex gap-3">
-          <button id="saveProfileBtn" class="px-5 py-2.5 bg-black text-white text-xs font-mono uppercase rounded-lg hover:bg-neutral-800 transition-all">
-            Guardar Cambios
-          </button>
-          <button id="cancelEditBtn" class="px-5 py-2.5 bg-white border border-black/20 text-xs font-mono uppercase rounded-lg hover:bg-neutral-100 transition-all">
-            Cancelar
-          </button>
+        <div class="mt-4 flex gap-2">
+          <button id="saveProfileBtn" class="px-4 py-2 bg-black text-white rounded">Guardar</button>
+          <button id="cancelEditBtn" class="px-4 py-2 border rounded">Cancelar</button>
         </div>
 
-        <div id="editMsg" class="mt-3 text-xs font-mono text-neutral-600"></div>
+        <div id="editMsg" class="mt-3 text-sm text-neutral-600"></div>
       </div>
 
     </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="border-t border-black/10 bg-white py-6 text-center text-xs font-mono text-neutral-500">
-    LUIZABETH'S.STUDIOS © 2026 — TODOS LOS DERECHOS RESERVADOS
-  </footer>
+  <footer class="text-center text-xs text-neutral-500 py-6">LUIZABETH'S.STUDIOS © 2026</footer>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Supabase config
+    // Config Supabase (usa tus valores)
     const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo';
-    const supabase = supabaseJs = supabase.createClient ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const LOCAL_SESSION_KEY = 'book_user_session';
 
-    // Menu Toggle
-    let isMenuOpen = false;
-    function toggleMenu() {
-      isMenuOpen = !isMenuOpen;
-      document.getElementById('sideMenu').classList.toggle('-translate-x-full', !isMenuOpen);
-      document.getElementById('menuOverlay').classList.toggle('opacity-0', !isMenuOpen);
-      document.getElementById('menuOverlay').classList.toggle('pointer-events-none', !isMenuOpen);
-    }
-
-    // Utility toast
-    function toast(msg) {
-      console.log(msg);
-    }
-
-    // Load profile and render
-    async function loadUserProfile() {
-      let profile = null;
-      try {
-        const stored = localStorage.getItem(LOCAL_SESSION_KEY);
-        if (stored) profile = JSON.parse(stored);
-      } catch(e){}
-
-      if (!profile) {
-        try {
-          const res = await supabase.auth.getSession();
-          const data = res && res.data ? res.data : res;
-          if (data && data.session && data.session.user) {
-            const user = data.session.user;
-            const meta = user.user_metadata || {};
-            profile = {
-              id: user.id,
-              email: user.email,
-              nombre: meta.nombre || user.email.split('@')[0],
-              apellido: meta.apellido || '',
-              edad: meta.edad || null,
-              gustos: meta.gustos || '',
-              foto_perfil: meta.foto_perfil || '',
-              followers_count: meta.followers_count || 0,
-              stars: meta.stars || 0
-            };
-          }
-        } catch(e){
-          console.warn('getSession error', e);
-        }
-      }
-
-      if (!profile) {
-        document.getElementById('profileNameTitle').innerText = 'Invitado';
-        showNoSessionState();
-        return;
-      }
-
-      // Render details
-      const fullName = (profile.nombre || 'Usuario') + (profile.apellido ? ' ' + profile.apellido : '');
-      document.getElementById('profileNameTitle').innerText = fullName;
-      document.getElementById('profileEmailSubtitle').innerText = profile.email || '';
-      document.getElementById('userHeaderEmail').innerText = profile.email || 'INVITADO';
-      document.getElementById('displayName').innerText = fullName;
-      document.getElementById('displayAge').innerText = profile.edad || '-';
-      document.getElementById('displayTaste').innerText = (profile.gustos || '-').toString().toUpperCase();
-      document.getElementById('displayId').innerText = profile.id || '-';
-
-      // Followers & Stars
-      document.getElementById('followersCount').innerText = profile.followers_count || 0;
-      document.getElementById('starsCount').innerText = profile.stars || 0;
-
-      // Avatar
-      const avatarImg = document.getElementById('profileAvatarImg');
-      const initial = document.getElementById('profileInitial');
-      if (profile.foto_perfil) {
-        avatarImg.src = profile.foto_perfil;
-        avatarImg.classList.remove('hidden');
-        initial.classList.add('hidden');
-      } else {
-        avatarImg.classList.add('hidden');
-        initial.classList.remove('hidden');
-        initial.innerText = (profile.nombre ? profile.nombre.charAt(0).toUpperCase() : 'U');
-      }
-
-      // Prefill edit form
-      document.getElementById('editNombre').value = profile.nombre || '';
-      document.getElementById('editApellido').value = profile.apellido || '';
-      document.getElementById('editEdad').value = profile.edad || '';
-      document.getElementById('editGustos').value = profile.gustos || '';
-
-      localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(profile));
-    }
-
-    function showNoSessionState() {
-      document.getElementById('profileNameTitle').innerText = 'SIN SESIÓN';
-      document.getElementById('profileEmailSubtitle').innerText = 'Inicia sesión para ver tus datos';
-      document.getElementById('displayName').innerText = '-';
-      document.getElementById('displayAge').innerText = '-';
-      document.getElementById('displayTaste').innerText = '-';
-      document.getElementById('displayId').innerText = '-';
-      document.getElementById('userHeaderEmail').innerText = 'DESCONECTADO';
-    }
-
-    async function logoutSession() {
-      try { await supabase.auth.signOut(); } catch(e){}
-      localStorage.removeItem(LOCAL_SESSION_KEY);
-      if (location.protocol === 'file:') {
-        showNoSessionState();
-        return;
-      }
-      window.location.href = 'index.html';
-    }
-
-    // Edit UI handlers
+    // Element references
     const editProfileBtn = document.getElementById('editProfileBtn');
     const editForm = document.getElementById('editForm');
     const saveProfileBtn = document.getElementById('saveProfileBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
     const avatarFileInput = document.getElementById('avatarFile');
-    const changePasswordBtn = document.getElementById('changePasswordBtn');
+    const changePasswordBtn = document.getElementById('changePasswordBtn'); // defined earlier
+    const btnFollow = document.getElementById('btnFollow');
+    const btnUnfollow = document.getElementById('btnUnfollow');
+    const btnAddStar = document.getElementById('btnAddStar');
+    const otherProfileActions = document.getElementById('otherProfileActions');
 
-    editProfileBtn?.addEventListener('click', () => {
-      editForm.classList.toggle('hidden');
-      if (!editForm.classList.contains('hidden')) {
-        editForm.scrollIntoView({behavior:'smooth', block:'center'});
+    // State
+    let viewingUserId = null; // if ?user=<id> param present, we view that user's profile; otherwise current user
+    let currentUserId = null;
+
+    // Helpers
+    function toast(msg) { console.log('[toast]', msg); }
+
+    async function getSessionUser() {
+      const s = await supabaseClient.auth.getSession();
+      const data = s && s.data ? s.data : s;
+      if (data && data.session && data.session.user) return data.session.user;
+      return null;
+    }
+
+    // Read query param user
+    function getQueryUserId() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('user'); // if present show that profile
+      } catch(e){ return null; }
+    }
+
+    // Load profile (works for own or other user)
+    async function loadProfile(userId = null) {
+      // Determine target user id
+      const sessionUser = await getSessionUser();
+      currentUserId = sessionUser ? sessionUser.id : null;
+      const targetId = userId || getQueryUserId() || currentUserId;
+
+      viewingUserId = targetId;
+
+      // UI defaults
+      document.getElementById('profileNameTitle').innerText = 'Cargando...';
+      document.getElementById('profileEmailSubtitle').innerText = '';
+      document.getElementById('displayName').innerText = '-';
+      document.getElementById('displayAge').innerText = '-';
+      document.getElementById('displayTaste').innerText = '-';
+      document.getElementById('displayId').innerText = '-';
+      document.getElementById('followersCount').innerText = '0';
+      document.getElementById('starsCount').innerText = '0';
+      otherProfileActions.classList.add('hidden');
+
+      if (!targetId) {
+        // No session and no user specified
+        document.getElementById('profileNameTitle').innerText = 'Invitado';
+        return;
       }
-    });
-    cancelEditBtn?.addEventListener('click', () => editForm.classList.add('hidden'));
 
-    // Save profile handler
+      // First try to get from profiles table
+      try {
+        const { data } = await supabaseClient
+          .from('profiles')
+          .select('id, display_name, followers_count, stars')
+          .eq('id', targetId)
+          .limit(1)
+          .single();
+
+        if (data) {
+          const display = data.display_name || (data.id ? data.id.substring(0,8) : 'Usuario');
+          document.getElementById('profileNameTitle').innerText = display;
+          document.getElementById('displayName').innerText = display;
+          document.getElementById('displayId').innerText = data.id || '-';
+          document.getElementById('followersCount').innerText = Number(data.followers_count || 0);
+          document.getElementById('starsCount').innerText = Number(data.stars || 0);
+
+          // If viewing other user's profile and logged in, show follow/unfollow actions
+          if (currentUserId && currentUserId !== targetId) {
+            otherProfileActions.classList.remove('hidden');
+            await updateFollowButtons(currentUserId, targetId);
+          }
+
+        } else {
+          // fallback to auth.users -> user_metadata (if profiles row not present)
+          await loadProfileFromAuthMeta(targetId);
+        }
+      } catch (err) {
+        // If error (table doesn't exist or permission), fallback to user metadata
+        console.warn('profiles fetch error, fallback to auth metadata', err);
+        await loadProfileFromAuthMeta(targetId);
+      }
+
+      // If target is current user, also fill edit form and avatar using auth metadata
+      if (currentUserId && targetId === currentUserId) {
+        // get metadata from auth (for avatar, name fields)
+        try {
+          const s = await supabaseClient.auth.getSession();
+          const sessionData = s && s.data ? s.data : s;
+          if (sessionData && sessionData.session && sessionData.session.user) {
+            const u = sessionData.session.user;
+            const meta = u.user_metadata || {};
+            // fill fields if shown
+            document.getElementById('profileEmailSubtitle').innerText = u.email || '';
+            document.getElementById('displayAge').innerText = meta.edad || '-';
+            document.getElementById('displayTaste').innerText = (meta.gustos || '-').toString().toUpperCase();
+            document.getElementById('editNombre').value = meta.nombre || '';
+            document.getElementById('editApellido').value = meta.apellido || '';
+            document.getElementById('editEdad').value = meta.edad || '';
+            document.getElementById('editGustos').value = meta.gustos || '';
+            // avatar
+            if (meta.foto_perfil) {
+              const avatarImg = document.getElementById('profileAvatarImg');
+              const initial = document.getElementById('profileInitial');
+              avatarImg.src = meta.foto_perfil;
+              avatarImg.classList.remove('hidden');
+              initial.classList.add('hidden');
+            }
+          }
+        } catch(e){ console.warn(e); }
+      }
+    }
+
+    // fallback: load from auth.user metadata
+    async function loadProfileFromAuthMeta(userId) {
+      try {
+        const { data: usersData, error } = await supabaseClient.auth.admin.getUserById
+          ? await supabaseClient.auth.admin.getUserById(userId) // not always available on client
+          : { data: null, error: 'admin.getUserById not available in client' };
+
+        // admin API not available on client; instead, try reading profiles via SELECT public.profiles if accessible was done earlier.
+        // As fallback show id
+        document.getElementById('profileNameTitle').innerText = userId.substring(0,8);
+        document.getElementById('displayName').innerText = userId.substring(0,8);
+        document.getElementById('displayId').innerText = userId;
+        document.getElementById('followersCount').innerText = '0';
+        document.getElementById('starsCount').innerText = '0';
+      } catch(e) {
+        console.warn('fallback auth meta failed', e);
+        document.getElementById('profileNameTitle').innerText = userId.substring(0,8);
+        document.getElementById('displayName').innerText = userId.substring(0,8);
+        document.getElementById('displayId').innerText = userId;
+      }
+    }
+
+    // Update follow/unfollow buttons
+    async function updateFollowButtons(meId, targetId) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('follows')
+          .select('*')
+          .match({ follower_id: meId, followee_id: targetId })
+          .limit(1);
+
+        if (error) {
+          console.warn('check follow error', error);
+          // fallback: hide unfollow
+          btnFollow.classList.remove('hidden');
+          btnUnfollow.classList.add('hidden');
+          return;
+        }
+
+        if (data && data.length > 0) {
+          // already following
+          btnFollow.classList.add('hidden');
+          btnUnfollow.classList.remove('hidden');
+        } else {
+          btnFollow.classList.remove('hidden');
+          btnUnfollow.classList.add('hidden');
+        }
+      } catch(e) { console.warn(e); }
+    }
+
+    // follow user
+    async function followUser(targetId) {
+      try {
+        const sessionUser = await getSessionUser();
+        if (!sessionUser) { alert('Inicia sesión para seguir a otros.'); return; }
+        const me = sessionUser.id;
+        const { data, error } = await supabaseClient
+          .from('follows')
+          .insert([{ follower_id: me, followee_id: targetId }]);
+
+        if (error) throw error;
+        toast('Seguido correctamente.');
+        // refresh counts from profiles table
+        await refreshCounts(targetId);
+        await updateFollowButtons(me, targetId);
+      } catch (err) {
+        console.error('followUser error', err);
+        alert('No se pudo seguir: ' + (err.message || err));
+      }
+    }
+
+    // unfollow user
+    async function unfollowUser(targetId) {
+      try {
+        const sessionUser = await getSessionUser();
+        if (!sessionUser) { alert('Inicia sesión para dejar de seguir.'); return; }
+        const me = sessionUser.id;
+        const { data, error } = await supabaseClient
+          .from('follows')
+          .delete()
+          .match({ follower_id: me, followee_id: targetId });
+
+        if (error) throw error;
+        toast('Dejado de seguir.');
+        await refreshCounts(targetId);
+        await updateFollowButtons(me, targetId);
+      } catch (err) {
+        console.error('unfollowUser error', err);
+        alert('No se pudo dejar de seguir: ' + (err.message || err));
+      }
+    }
+
+    // refresh followers_count & stars for a target user (reads profiles table)
+    async function refreshCounts(targetId) {
+      try {
+        const { data, error } = await supabaseClient.from('profiles').select('followers_count,stars').eq('id', targetId).limit(1).single();
+        if (error) throw error;
+        document.getElementById('followersCount').innerText = Number(data.followers_count || 0);
+        document.getElementById('starsCount').innerText = Number(data.stars || 0);
+      } catch (err) {
+        console.warn('refreshCounts fallback to metadata', err);
+        // fallback: try metadata of target (not trivial from client), so leave as-is
+      }
+    }
+
+    // add star to target
+    async function addStarToUser(targetId) {
+      try {
+        const sessionUser = await getSessionUser();
+        if (!sessionUser) { alert('Inicia sesión para añadir estrellas.'); return; }
+        // upsert into profiles: increment stars
+        const { data: existing, error: selErr } = await supabaseClient.from('profiles').select('stars').eq('id', targetId).limit(1).single();
+        if (!selErr && existing) {
+          const newStars = (existing.stars || 0) + 1;
+          const { error: upErr } = await supabaseClient.from('profiles').upsert({ id: targetId, stars: newStars }, { onConflict: 'id' });
+          if (upErr) throw upErr;
+          document.getElementById('starsCount').innerText = newStars;
+          toast('Estrella añadida.');
+          return;
+        }
+        // fallback: try metadata update if target is self
+        if (sessionUser.id === targetId) {
+          const local = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || '{}');
+          const newStars = (Number(local.stars || 0) + 1);
+          await supabaseClient.auth.updateUser({ data: { stars: newStars } });
+          local.stars = newStars;
+          localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
+          document.getElementById('starsCount').innerText = newStars;
+          toast('Estrella añadida (metadata).');
+        } else {
+          alert('No se pudo añadir estrella (falta tabla profiles).');
+        }
+      } catch(e) {
+        console.error('addStar error', e);
+        alert('Error al añadir estrella: ' + (e.message || e));
+      }
+    }
+
+    // Save profile (name, apellido, edad, gustos) + optional avatar upload
     saveProfileBtn?.addEventListener('click', async () => {
       saveProfileBtn.disabled = true;
       saveProfileBtn.innerText = 'GUARDANDO...';
@@ -437,89 +416,60 @@
         const edad = document.getElementById('editEdad').value || null;
         const gustos = document.getElementById('editGustos').value.trim() || 'movie';
 
+        // upload avatar if selected
         let foto_perfil_url = null;
         const file = avatarFileInput.files && avatarFileInput.files[0];
-        if (file) {
+        const sessionUser = await getSessionUser();
+        const userId = sessionUser ? sessionUser.id : null;
+
+        if (file && userId) {
+          const path = `avatars/${userId}/${Date.now()}_${file.name}`;
           try {
-            const sessionRes = await supabase.auth.getSession();
-            const session = sessionRes && sessionRes.data ? sessionRes.data.session : (sessionRes && sessionRes.session ? sessionRes.session : null);
-            const userId = session && session.user ? session.user.id : null;
-            if (userId) {
-              const path = `avatars/${userId}/${Date.now()}_${file.name}`;
-              const upload = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
-              if (upload.error) {
-                foto_perfil_url = await fileToDataURL(file);
-              } else {
-                const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(path);
-                foto_perfil_url = publicData ? publicData.publicUrl : null;
-              }
-            } else {
+            const up = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
+            if (up.error) {
+              console.warn('storage upload error', up.error);
               foto_perfil_url = await fileToDataURL(file);
+            } else {
+              const { data: pd } = supabaseClient.storage.from('avatars').getPublicUrl(path);
+              foto_perfil_url = pd && pd.publicUrl ? pd.publicUrl : null;
             }
-          } catch (err) {
+          } catch(e) {
+            console.warn('upload exception', e);
             foto_perfil_url = await fileToDataURL(file);
           }
         }
 
-        const metadataUpdate = {
-          nombre,
-          apellido,
-          edad: edad ? Number(edad) : null,
-          gustos: gustos
-        };
-        if (foto_perfil_url) metadataUpdate.foto_perfil = foto_perfil_url;
+        // Update user metadata
+        const meta = { nombre, apellido, edad: edad ? Number(edad) : null, gustos };
+        if (foto_perfil_url) meta.foto_perfil = foto_perfil_url;
 
         try {
-          const updateResp = await supabase.auth.updateUser({ data: metadataUpdate });
-          if (updateResp.error) throw updateResp.error;
-          await loadUserProfile();
-          document.getElementById('editMsg').innerText = 'Perfil guardado correctamente.';
-        } catch (err) {
-          console.error('updateUser error', err);
-          document.getElementById('editMsg').innerText = 'Guardado en modo local.';
-          const localP = await getLocalProfile();
-          localP.nombre = nombre; localP.apellido = apellido; localP.edad = edad; localP.gustos = gustos;
-          if (foto_perfil_url) localP.foto_perfil = foto_perfil_url;
-          localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(localP));
-          await loadUserProfile();
+          const { data, error } = await supabaseClient.auth.updateUser({ data: meta });
+          if (error) throw error;
+          // Also upsert into profiles table display_name for quick public reading
+          try {
+            const display_name = (nombre || '') + (apellido ? ' ' + apellido : '');
+            await supabaseClient.from('profiles').upsert({ id: userId, display_name }, { onConflict: 'id' });
+          } catch(e) { console.warn('profiles upsert failed', e); }
+          toast('Perfil actualizado.');
+          await loadProfile(userId);
+          editForm.classList.add('hidden');
+        } catch(e) {
+          console.warn('updateUser metadata failed', e);
+          document.getElementById('editMsg').innerText = 'No se pudo guardar en Supabase. Guardado localmente.';
+          // fallback localStorage
+          const local = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || '{}');
+          local.nombre = nombre; local.apellido = apellido; local.edad = edad; local.gustos = gustos;
+          if (foto_perfil_url) local.foto_perfil = foto_perfil_url;
+          localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
+          await loadProfile(userId);
         }
-      } catch (e) {
+      } catch(e) {
         console.error(e);
         document.getElementById('editMsg').innerText = 'Error guardando perfil.';
-      } fontFinally: {
-        saveProfileBtn.disabled = false;
-        saveProfileBtn.innerText = 'Guardar Cambios';
-      }
-    });
-
-    function fileToDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(r.result);
-        r.onerror = () => reject(new Error('Error reading file'));
-        r.readAsDataURL(file);
-      });
-    }
-
-    // Password change
-    changePasswordBtn?.addEventListener('click', async () => {
-      const newPass = document.getElementById('newPassword').value;
-      if (!newPass || newPass.length < 6) {
-        alert('Ingresa una contraseña de al menos 6 caracteres.');
-        return;
-      }
-      changePasswordBtn.disabled = true;
-      changePasswordBtn.innerText = 'CAMBIANDO...';
-      try {
-        const { data, error } = await supabase.auth.updateUser({ password: newPass });
-        if (error) throw error;
-        alert('Contraseña actualizada correctamente.');
-        document.getElementById('newPassword').value = '';
-      } catch (err) {
-        alert('Error al cambiar contraseña: ' + (err?.message || err));
       } finally {
-        changePasswordBtn.disabled = false;
-        changePasswordBtn.innerText = 'Cambiar';
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.innerText = 'Guardar';
       }
     });
 
@@ -530,34 +480,36 @@
       uploadAvatarBtn.disabled = true;
       uploadAvatarBtn.innerText = 'SUBIENDO...';
       try {
-        const sessionRes = await supabase.auth.getSession();
-        const session = sessionRes && sessionRes.data ? sessionRes.data.session : (sessionRes && sessionRes.session ? sessionRes.session : null);
-        const userId = session && session.user ? session.user.id : null;
+        const sessionUser = await getSessionUser();
+        const userId = sessionUser ? sessionUser.id : null;
         let foto_perfil_url = null;
         if (userId) {
           const path = `avatars/${userId}/${Date.now()}_${file.name}`;
-          const up = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+          const up = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
           if (up.error) {
+            console.warn('upload error', up.error);
             foto_perfil_url = await fileToDataURL(file);
           } else {
-            const { data: pd } = supabase.storage.from('avatars').getPublicUrl(path);
-            foto_perfil_url = pd ? pd.publicUrl : null;
+            const { data: pd } = supabaseClient.storage.from('avatars').getPublicUrl(path);
+            foto_perfil_url = pd && pd.publicUrl ? pd.publicUrl : null;
           }
         } else {
           foto_perfil_url = await fileToDataURL(file);
         }
-
+        // update metadata
         try {
-          const u = await supabase.auth.updateUser({ data: { foto_perfil: foto_perfil_url } });
-          if (u.error) throw u.error;
-          await loadUserProfile();
+          await supabaseClient.auth.updateUser({ data: { foto_perfil: foto_perfil_url } });
+          await loadProfile(userId || null);
+          toast('Avatar actualizado.');
         } catch (err) {
-          const local = await getLocalProfile();
+          console.warn('update metadata failed', err);
+          const local = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || '{}');
           local.foto_perfil = foto_perfil_url;
           localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
-          await loadUserProfile();
+          await loadProfile(userId || null);
         }
-      } catch (e) {
+      } catch(e) {
+        console.error(e);
         alert('Error subiendo avatar.');
       } finally {
         uploadAvatarBtn.disabled = false;
@@ -565,58 +517,92 @@
       }
     });
 
-    // Followers / Stars simulation
-    const btnSimulateFollow = document.getElementById('btnSimulateFollow');
-    const btnAddStar = document.getElementById('btnAddStar');
-
-    btnSimulateFollow?.addEventListener('click', async () => {
+    // Change password
+    document.getElementById('changePasswordBtn')?.addEventListener('click', async () => {
+      const newPass = document.getElementById('newPassword').value;
+      if (!newPass || newPass.length < 6) {
+        alert('Ingresa una contraseña de al menos 6 caracteres.');
+        return;
+      }
+      const btn = document.getElementById('changePasswordBtn');
+      btn.disabled = true; btn.innerText = 'CAMBIANDO...';
       try {
-        const local = await getLocalProfile();
-        const current = Number(local.followers_count || 0);
-        local.followers_count = current + 1;
-        try {
-          await supabase.auth.updateUser({ data: { followers_count: local.followers_count } });
-        } catch (err) {}
-        localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
-        document.getElementById('followersCount').innerText = local.followers_count;
-      } catch (e) { console.error(e); }
+        const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
+        if (error) throw error;
+        alert('Contraseña cambiada correctamente.');
+        document.getElementById('newPassword').value = '';
+      } catch(err) {
+        console.error(err);
+        alert('Error al cambiar contraseña: ' + (err?.message || err));
+      } finally {
+        btn.disabled = false; btn.innerText = 'Cambiar';
+      }
     });
 
-    btnAddStar?.addEventListener('click', async () => {
-      try {
-        const local = await getLocalProfile();
-        local.stars = Number(local.stars || 0) + 1;
-        try {
-          await supabase.auth.updateUser({ data: { stars: local.stars } });
-        } catch (err) {}
-        localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
-        document.getElementById('starsCount').innerText = local.stars;
-      } catch (e) { console.error(e); }
-    });
-
-    async function getLocalProfile() {
-      try {
-        const s = localStorage.getItem(LOCAL_SESSION_KEY);
-        return s ? JSON.parse(s) : {};
-      } catch(e) { return {}; }
+    // helper file -> dataurl
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Error leyendo archivo'));
+        reader.readAsDataURL(file);
+      });
     }
 
-    // Initial load
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) lucide.createIcons();
-      loadUserProfile();
+    // follow/unfollow button handlers
+    btnFollow?.addEventListener('click', async () => {
+      if (!viewingUserId) return;
+      await followUser(viewingUserId);
+    });
+    btnUnfollow?.addEventListener('click', async () => {
+      if (!viewingUserId) return;
+      await unfollowUser(viewingUserId);
+    });
+    btnAddStar?.addEventListener('click', async () => {
+      if (!viewingUserId) return;
+      await addStarToUser(viewingUserId);
     });
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    // edit form toggles
+    editProfileBtn?.addEventListener('click', () => {
+      editForm.classList.toggle('hidden');
+      if (!editForm.classList.contains('hidden')) editForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    cancelEditBtn?.addEventListener('click', () => editForm.classList.add('hidden'));
+
+    // logout
+    async function logoutSession() {
+      try { await supabaseClient.auth.signOut(); } catch(e){}
+      localStorage.removeItem(LOCAL_SESSION_KEY);
+      if (location.protocol === 'file:') {
+        // if opened as file, just clear UI
+        location.reload();
+        return;
+      }
+      window.location.href = 'index.html';
+    }
+
+    // On load
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadProfile();
+    });
+
+    // Auth state change -> update local and reload profile
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
       if (session && session.user) {
         const u = session.user;
         const meta = u.user_metadata || {};
         const profile = { id: u.id, email: u.email, nombre: meta.nombre || '', apellido: meta.apellido || '', edad: meta.edad || '', gustos: meta.gustos || '', foto_perfil: meta.foto_perfil || '', followers_count: meta.followers_count || 0, stars: meta.stars || 0 };
         localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(profile));
-        loadUserProfile();
+        loadProfile();
+      } else {
+        // logged out
+        localStorage.removeItem(LOCAL_SESSION_KEY);
+        loadProfile();
       }
     });
+
   </script>
 </body>
 </html>
-```eof
