@@ -14,18 +14,20 @@
     a { color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: .78rem; letter-spacing: .08em; }
     
     .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
-    .zone-card { background: rgba(30,30,36,.9); border: 1px solid rgba(255,255,255,.22); border-radius: 2px; padding: 18px; text-align: center; backdrop-filter: blur(6px); }
+    .zone-card { background: rgba(30,30,36,.9); border: 1px solid rgba(255,255,255,.22); border-radius: 2px; padding: 18px; text-align: center; backdrop-filter: blur(6px); position: relative; }
     .zone-card h3 { margin-bottom: 10px; color: #f3f4f6; }
     .zone-card .badge { display: inline-block; padding: 4px 8px; background: #374151; border-radius: 12px; font-size: 0.8rem; margin-bottom: 12px; }
     
-    button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+    button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 4px; }
     button:disabled { background: #4b5563; cursor: not-allowed; }
     button.leave { background: #ef4444; }
+    button.delete { background: #dc2626; margin-top: 8px; }
 
     /* Modal / Canvas de Dibujo */
     #canvasView { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; flex-direction: column; }
-    .canvas-tools { background: #18181b; padding: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .canvas-tools { background: #18181b; padding: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
     canvas { flex: 1; background: #111; cursor: crosshair; touch-action: none; }
+    .mobile-note { margin-top: 8px; font-size: 0.9rem; color: #f97316; }
   </style>
 </head>
 <body>
@@ -41,6 +43,10 @@
       <button id="createZoneBtn" style="width: auto;">Crear Zona (Máx 20)</button>
     </div>
 
+    <div id="mobileNotice" class="mobile-note" style="display: none;">
+      La creación de zonas está deshabilitada en dispositivos móviles. Usa una computadora para crear una zona.
+    </div>
+
     <h2>Zonas Disponibles</h2>
     <div id="zonesGrid" class="grid-container">Cargando zonas...</div>
   </section>
@@ -51,6 +57,7 @@
       <div style="display: flex; gap: 10px; align-items: center;">
         <button id="exitZoneBtn" class="leave" style="width: auto;">Salir de la Zona</button>
         <span id="currentZoneTitle">Zona</span>
+        <span id="onlineCounter" style="font-size: 0.85rem; color: #10b981; margin-left: 10px;">🟢 Conectados: 1</span>
       </div>
       <div style="display: flex; gap: 10px; align-items: center;">
         <label>Color: <input type="color" id="brushColor" value="#ff0055"></label>
@@ -62,7 +69,6 @@
 
 <script>
   const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
-  // Aquí ya colocamos tu clave exacta:
   const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo'; 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -70,6 +76,13 @@
   let activeZoneId = null;
   let isDrawing = false;
   let ctx, canvas;
+  let activeChannel = null;
+
+  // Detectar si el usuario está desde un teléfono móvil
+  function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+      || window.innerWidth <= 768;
+  }
 
   async function init() {
     const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -83,12 +96,27 @@
     currentUser = session.user;
     setupCanvas();
     loadZones();
+    
+    // Escuchar cuando se crean o borran zonas en tiempo real
+    supabaseClient
+      .channel('public_zones')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'graffiti_zones' }, () => {
+        loadZones();
+      })
+      .subscribe();
+
+    // Si es dispositivo móvil, deshabilitar creación UI por UX
+    if (isMobileDevice()) {
+      document.getElementById('createZoneBtn').disabled = true;
+      document.getElementById('zoneNameInput').disabled = true;
+      document.getElementById('mobileNotice').style.display = 'block';
+    }
   }
 
   async function loadZones() {
     const { data: zones, error } = await supabaseClient
       .from('graffiti_zones')
-      .select('*, zone_members(user_id)');
+      .select('*');
       
     if (error) {
       console.error("Error al cargar zonas:", error.message);
@@ -104,29 +132,54 @@
     }
 
     zones.forEach(zone => {
-      const memberCount = zone.zone_members ? zone.zone_members.length : 0;
-      const isMember = zone.zone_members.some(m => m.user_id === currentUser.id);
+      const isOwner = zone.created_by === currentUser.id;
       
       const card = document.createElement('div');
       card.className = 'zone-card';
       card.innerHTML = `
         <h3>${zone.name}</h3>
-        <span class="badge">${memberCount} / 10 Personas</span>
-        ${isMember 
-          ? `<button onclick="enterZone('${zone.id}', '${zone.name}')">Entrar a Dibujar</button>`
-          : memberCount >= 10 
-            ? `<button disabled>Zona Llena</button>` 
-            : `<button onclick="joinZone('${zone.id}')">Unirse y Dibujar</button>`}
+        <button onclick="enterZone('${zone.id}', '${zone.name}')">Entrar a Dibujar</button>
+        ${isOwner ? `<button class="delete" onclick="deleteZone('${zone.id}')">Borrar Mi Zona</button>` : ''}
       `;
       grid.appendChild(card);
     });
   }
 
+  // Reemplazo del handler: bloquea creación en móviles y realiza las validaciones
   document.getElementById('createZoneBtn').addEventListener('click', async () => {
+    // Bloqueo en dispositivos móviles
+    if (isMobileDevice()) {
+      alert("La creación de zonas solo está disponible desde una computadora.");
+      return;
+    }
+
     const name = document.getElementById('zoneNameInput').value.trim();
     if (!name) return alert("Escribe un nombre para la zona");
 
-    const { data: currentZones } = await supabaseClient.from('graffiti_zones').select('id');
+    // Validar si el usuario ya creó una zona
+    const { data: userZones, error: userZonesError } = await supabaseClient
+      .from('graffiti_zones')
+      .select('id')
+      .eq('created_by', currentUser.id);
+
+    if (userZonesError) {
+      console.error('Error comprobando zonas del usuario:', userZonesError);
+      alert('Error interno, inténtalo de nuevo.');
+      return;
+    }
+
+    if (userZones && userZones.length > 0) {
+      alert("Ya tienes una zona creada. Debes borrar la tuya si quieres crear una nueva.");
+      return;
+    }
+
+    // Validar límite total de 20 zonas
+    const { data: currentZones, error: zonesError } = await supabaseClient.from('graffiti_zones').select('id');
+    if (zonesError) {
+      console.error('Error comprobando zonas totales:', zonesError);
+      alert('Error interno, inténtalo de nuevo.');
+      return;
+    }
     if (currentZones && currentZones.length >= 20) {
       alert("Se ha alcanzado el límite máximo de 20 zonas activas.");
       return;
@@ -139,18 +192,26 @@
       .single();
 
     if (error) {
-      console.error("Error al crear zona:", error.message);
       alert("Error al crear zona: " + error.message);
     } else {
-      await joinZone(data.id);
       document.getElementById('zoneNameInput').value = '';
+      enterZone(data.id, data.name);
     }
   });
 
-  async function joinZone(zoneId) {
-    await supabaseClient.from('zone_members').insert([{ zone_id: zoneId, user_id: currentUser.id }]);
-    const { data: zone } = await supabaseClient.from('graffiti_zones').select('name').eq('id', zoneId).single();
-    if (zone) enterZone(zoneId, zone.name);
+  async function deleteZone(zoneId) {
+    if (!confirm("¿Seguro que quieres borrar tu zona y todos sus trazos?")) return;
+
+    // Borrar trazos
+    await supabaseClient.from('graffiti_strokes').delete().eq('zone_id', zoneId);
+    // Borrar zona
+    const { error } = await supabaseClient.from('graffiti_zones').delete().eq('id', zoneId);
+
+    if (error) {
+      alert("Error al borrar zona: " + error.message);
+    } else {
+      loadZones();
+    }
   }
 
   function enterZone(zoneId, zoneName) {
@@ -159,9 +220,37 @@
     document.getElementById('canvasView').style.display = 'flex';
     resizeCanvas();
     loadStrokes();
+
+    // CANAL EN TIEMPO REAL: Presencia y Trazos de Dibujo
+    activeChannel = supabaseClient.channel(`room_${zoneId}`, {
+      config: { presence: { key: currentUser.id } }
+    });
+
+    // 1. Contar personas dentro en tiempo real (al entrar o salir)
+    activeChannel.on('presence', { event: 'sync' }, () => {
+      const state = activeChannel.presenceState();
+      const count = Object.keys(state).length;
+      document.getElementById('onlineCounter').textContent = `🟢 Conectados: ${count}`;
+    });
+
+    // 2. Recibir dibujos en tiempo real de otros usuarios
+    activeChannel.on('broadcast', { event: 'stroke' }, payload => {
+      renderStroke(payload.payload.stroke_data);
+    });
+
+    activeChannel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await activeChannel.track({ user_id: currentUser.id, online_at: new Date() });
+      }
+    });
   }
 
   document.getElementById('exitZoneBtn').addEventListener('click', async () => {
+    if (activeChannel) {
+      await activeChannel.untrack();
+      await supabaseClient.removeChannel(activeChannel);
+      activeChannel = null;
+    }
     document.getElementById('canvasView').style.display = 'none';
     activeZoneId = null;
     loadZones();
@@ -175,6 +264,7 @@
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
     window.addEventListener('resize', resizeCanvas);
   }
 
@@ -211,6 +301,16 @@
     if (!isDrawing) return;
     isDrawing = false;
     if (currentStroke.length > 0 && activeZoneId) {
+      // Transmitir en tiempo real a los demás conectados
+      if (activeChannel) {
+        activeChannel.send({
+          type: 'broadcast',
+          event: 'stroke',
+          payload: { stroke_data: currentStroke }
+        });
+      }
+
+      // Guardar en la base de datos para la memoria permanente
       await supabaseClient.from('graffiti_strokes').insert([{
         zone_id: activeZoneId,
         user_id: currentUser.id,
@@ -220,7 +320,7 @@
   }
 
   function renderStroke(points) {
-    if (points.length < 2) return;
+    if (!points || points.length < 2) return;
     ctx.beginPath();
     ctx.strokeStyle = points[0].color;
     ctx.lineWidth = points[0].size;
