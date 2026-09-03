@@ -145,7 +145,7 @@
 
     <!-- BUSCADOR Y CARRITO (Derecha) -->
     <div class="flex items-center gap-3 md:gap-5">
-      <button id="navUserBtn" onclick="openAuthModal()" class="flex items-center gap-2 bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all"><i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel">ENTRAR</span></button>
+      <button id="navUserBtn" onclick="window.location.href='users.html'" class="flex items-center gap-2 bg-black text-white px-3.5 py-1.5 rounded-full text-xs font-mono hover:bg-neutral-800 transition-all"><i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel">ENTRAR</span></button>
       <div class="relative hidden sm:flex items-center">
         <input type="text" placeholder="Buscar libros, diarios..." class="w-40 lg:w-56 py-1.5 pl-4 pr-9 text-xs bg-transparent border border-black rounded-full focus:outline-none focus:ring-1 focus:ring-black transition-all">
         <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 text-black"></i>
@@ -1441,7 +1441,7 @@
         if (logoutBtn) logoutBtn.classList.add('hidden');
         if (navUserBtn) {
           navUserBtn.innerHTML = '<i data-lucide="user" class="w-3.5 h-3.5"></i><span id="navUserLabel" class="uppercase tracking-wider">ENTRAR</span>';
-          navUserBtn.onclick = function() { openAuthModal(); };
+          navUserBtn.onclick = function() { window.location.href = 'users.html'; };
         }
         if (heroSignInBtn) {
           heroSignInBtn.innerHTML = '<span>Sign in / Registrarse</span><i data-lucide="arrow-right" class="w-4 h-4"></i>';
