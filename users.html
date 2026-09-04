@@ -1,608 +1,525 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mi Perfil — BOOK</title>
-  <link rel="icon" href="films1.png" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOK - Santuario del Graffiti</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    .bg-grid-pattern {
-      background-color: #f7f7f8;
-      background-image:
-        linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px);
-      background-size: 20px 20px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+    body { min-height: 100vh; background: #0f0f11 url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/huhu.jpg-Q9dk94t2yqheRAyhj0ksdmNx0848jB.png') center / cover fixed no-repeat; color: #fff; padding: 28px; position: relative; }
+    body::before { content: ''; position: fixed; inset: 0; background: rgba(15,15,17,.78); z-index: -1; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,.22); padding-bottom: 18px; }
+    h1, h2, h3 { letter-spacing: .04em; }
+    a { color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: .78rem; letter-spacing: .08em; }
+    
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+    .zone-card { background: rgba(30,30,36,.9); border: 1px solid rgba(255,255,255,.22); border-radius: 2px; padding: 18px; text-align: center; backdrop-filter: blur(6px); position: relative; }
+    .zone-card h3 { margin-bottom: 10px; color: #f3f4f6; }
+    .zone-card .badge { display: inline-block; padding: 4px 8px; background: #374151; border-radius: 12px; font-size: 0.8rem; margin-bottom: 12px; }
+    
+    button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 4px; }
+    button:disabled { background: #4b5563; cursor: not-allowed; }
+    button.leave { background: #ef4444; }
+    button.delete { background: #dc2626; margin-top: 8px; }
+
+    /* Modal / Canvas de Dibujo */
+    #canvasView { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; flex-direction: column; }
+    .canvas-tools { background: #18181b; padding: 10px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .tool-group { display: flex; gap: 8px; align-items: center; background: #27272a; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; }
+    .tool-btn { background: #3f3f46; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; margin: 0; }
+    .tool-btn.active { background: #3b82f6; }
+
+    .workspace { display: flex; flex-direction: row; width: 100%; height: calc(100vh - 65px); overflow: hidden; position: relative; }
+    canvas { flex: 1; width: 100%; background: #111; cursor: crosshair; touch-action: none; }
+
+    /* Panel Lateral Derecho para Usuarios e Historial */
+    .sidebar { width: 260px; min-width: 260px; background: #18181b; border-left: 1px solid #27272a; display: flex; flex-direction: column; padding: 15px; gap: 15px; overflow-y: auto; font-size: 0.85rem; z-index: 10; }
+    .sidebar-section { background: #27272a; border-radius: 6px; padding: 10px; }
+    .sidebar-section h4 { margin-bottom: 8px; font-size: 0.9rem; color: #60a5fa; border-bottom: 1px solid #3f3f46; padding-bottom: 4px; }
+    .user-list, .history-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .user-item { display: flex; align-items: center; gap: 6px; color: #e4e4e7; word-break: break-all; }
+    .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .history-item { color: #a1a1aa; font-size: 0.78rem; display: flex; justify-content: space-between; }
   </style>
 </head>
-<body class="bg-grid-pattern font-sans min-h-screen text-black">
+<body>
 
-  <header class="w-full bg-white/90 p-4 border-b">
-    <div class="max-w-4xl mx-auto flex justify-between items-center">
-      <a href="index.html" class="font-archivo text-lg uppercase">← VOLVER A BOOK</a>
-      <div id="userHeaderEmail" class="text-xs text-neutral-600"></div>
-    </div>
+  <header>
+    <h1>Santuario de Graffiti</h1>
+    <a href="index.html">← Volver al Inicio</a>
   </header>
 
-  <main class="max-w-4xl mx-auto p-6">
-    <div class="bg-white border rounded-2xl p-6 shadow">
-      <div class="flex items-center gap-6 border-b pb-6">
-        <div id="profileAvatarContainer" class="w-28 h-28 rounded-full bg-black text-white flex items-center justify-center text-3xl overflow-hidden border-2 relative">
-          <img id="profileAvatarImg" src="" alt="" class="w-full h-full object-cover hidden">
-          <span id="profileInitial" class="font-bold">U</span>
-        </div>
-
-        <div class="flex-1">
-          <div class="text-xs uppercase text-neutral-500 tracking-widest">Panel de Usuario</div>
-          <h1 id="profileNameTitle" class="text-2xl font-bold mt-1">Cargando...</h1>
-          <div id="profileEmailSubtitle" class="text-xs text-neutral-500 mt-1"></div>
-        </div>
-
-        <div class="text-right">
-          <button id="editProfileBtn" class="px-3 py-2 bg-black text-white rounded">Editar Perfil</button>
-          <button id="logoutBtnSmall" onclick="logoutSession()" class="px-3 py-2 ml-2 bg-red-100 text-red-700 rounded">Cerrar sesión</button>
-        </div>
-      </div>
-
-      <div id="profileContent" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="text-[10px] uppercase font-mono text-neutral-500">Nombre completo</label>
-          <div id="displayName" class="mt-1 text-sm font-bold">-</div>
-
-          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">Edad</label>
-          <div id="displayAge" class="mt-1">-</div>
-
-          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">Categoría / Gusto favorito</label>
-          <div id="displayTaste" class="mt-1 uppercase">-</div>
-
-          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">ID (Supabase)</label>
-          <div id="displayId" class="mt-1 text-xs text-neutral-600 break-all">-</div>
-        </div>
-
-        <div>
-          <label class="text-[10px] uppercase font-mono text-neutral-500">Contraseña</label>
-          <div class="mt-1 flex items-center gap-2">
-            <input id="newPassword" type="password" placeholder="Nueva contraseña" class="flex-1 px-3 py-2 border rounded" />
-            <button id="changePasswordBtn" class="px-3 py-2 bg-black text-white rounded">Cambiar</button>
-          </div>
-
-          <label class="text-[10px] uppercase font-mono text-neutral-500 mt-4 block">Foto de Perfil</label>
-          <div class="mt-1 flex items-center gap-2">
-            <input id="avatarFile" type="file" accept="image/*" class="text-xs" />
-            <button id="uploadAvatarBtn" class="px-3 py-2 bg-black text-white rounded">Subir</button>
-          </div>
-
-          <div class="mt-6 border-t pt-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-[10px] uppercase text-neutral-500 font-mono">Seguidores</div>
-                <div id="followersCount" class="text-xl font-bold">0</div>
-              </div>
-              <div>
-                <div class="text-[10px] uppercase text-neutral-500 font-mono">Estrellas</div>
-                <div id="starsCount" class="text-xl font-bold">0</div>
-              </div>
-            </div>
-
-            <div id="otherProfileActions" class="mt-4 hidden">
-              <button id="btnFollow" class="px-3 py-2 bg-white border rounded">Seguir</button>
-              <button id="btnUnfollow" class="px-3 py-2 bg-white border rounded hidden">Dejar de seguir</button>
-              <button id="btnAddStar" class="px-3 py-2 bg-yellow-300 rounded ml-2">Añadir estrella</button>
-            </div>
-
-            <div id="backendNote" class="mt-3 text-xs text-neutral-500">
-              Nota: seguidores/estrellas usan la tabla "profiles" y "follows" si existen en Supabase; en caso contrario se usan campos en user_metadata (fallback).
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="editForm" class="mt-6 bg-neutral-50 p-4 rounded hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="text-[10px] uppercase text-neutral-500">Nombre</label>
-            <input id="editNombre" type="text" class="w-full px-3 py-2 border rounded" />
-          </div>
-          <div>
-            <label class="text-[10px] uppercase text-neutral-500">Apellido</label>
-            <input id="editApellido" type="text" class="w-full px-3 py-2 border rounded" />
-          </div>
-          <div>
-            <label class="text-[10px] uppercase text-neutral-500">Edad</label>
-            <input id="editEdad" type="number" min="10" max="120" class="w-full px-3 py-2 border rounded" />
-          </div>
-          <div>
-            <label class="text-[10px] uppercase text-neutral-500">Gustos / Categoría</label>
-            <input id="editGustos" type="text" class="w-full px-3 py-2 border rounded" />
-          </div>
-        </div>
-
-        <div class="mt-4 flex gap-2">
-          <button id="saveProfileBtn" class="px-4 py-2 bg-black text-white rounded">Guardar</button>
-          <button id="cancelEditBtn" class="px-4 py-2 border rounded">Cancelar</button>
-        </div>
-
-        <div id="editMsg" class="mt-3 text-sm text-neutral-600"></div>
-      </div>
-
+  <section id="lobbyView">
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <input type="text" id="zoneNameInput" placeholder="Nombre de nueva zona..." style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; flex: 1;">
+      <button id="createZoneBtn" style="width: auto;">Crear Zona (Máx 20)</button>
     </div>
-  </main>
 
-  <footer class="text-center text-xs text-neutral-500 py-6">LUIZABETH'S.STUDIOS © 2026</footer>
+    <h2>Zonas Disponibles</h2>
+    <div id="zonesGrid" class="grid-container">Cargando zonas...</div>
+  </section>
 
-  <script>
-    // Config Supabase (usa tus valores)
-    const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const LOCAL_SESSION_KEY = 'book_user_session';
+  <!-- Pantalla de Dibujo -->
+  <div id="canvasView">
+    <div class="canvas-tools">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button id="exitZoneBtn" class="leave" style="width: auto;">Salir</button>
+        <span id="currentZoneTitle" style="font-weight: bold; color: #60a5fa;">Zona</span>
+      </div>
 
-    // Element references
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    const editForm = document.getElementById('editForm');
-    const saveProfileBtn = document.getElementById('saveProfileBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
-    const avatarFileInput = document.getElementById('avatarFile');
-    const changePasswordBtn = document.getElementById('changePasswordBtn'); // defined earlier
-    const btnFollow = document.getElementById('btnFollow');
-    const btnUnfollow = document.getElementById('btnUnfollow');
-    const btnAddStar = document.getElementById('btnAddStar');
-    const otherProfileActions = document.getElementById('otherProfileActions');
+      <!-- Barra de Herramientas Avanzadas -->
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <div class="tool-group">
+          <button id="brushMode" class="tool-btn active" onclick="setTool('brush')">Pincel</button>
+          <button id="sprayMode" class="tool-btn" onclick="setTool('spray')">Spray</button>
+          <button id="shapeMode" class="tool-btn" onclick="setTool('shape')">Cuadrado</button>
+          <button id="eraserMode" class="tool-btn" onclick="setTool('eraser')">Borrador</button>
+        </div>
 
-    // State
-    let viewingUserId = null; // if ?user=<id> param present, we view that user's profile; otherwise current user
-    let currentUserId = null;
+        <div class="tool-group">
+          <button class="tool-btn" onclick="undoLastStroke()" title="Deshacer último trazo propio">↩ Deshacer</button>
+          <button id="ruleToggleBtn" class="tool-btn" onclick="toggleRuler()">📏 Regla: OFF</button>
+        </div>
 
-    // Helpers
-    function toast(msg) { console.log('[toast]', msg); }
+        <div class="tool-group">
+          <label>Color: <input type="color" id="brushColor" value="#ff0055"></label>
+          <label>Grosor: <input type="range" id="brushSize" min="2" max="60" value="8"></label>
+          <label>Opacidad: <input type="range" id="brushOpacity" min="0.1" max="1" step="0.1" value="1"></label>
+        </div>
+      </div>
+    </div>
 
-    async function getSessionUser() {
-      const s = await supabaseClient.auth.getSession();
-      const data = s && s.data ? s.data : s;
-      if (data && data.session && data.session.user) return data.session.user;
-      return null;
+    <div class="workspace">
+      <canvas id="graffitiCanvas"></canvas>
+      
+      <!-- Panel Lateral Derecho -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h4>🟢 Conectados (<span id="connectedCount">0</span>)</h4>
+          <ul id="connectedUsersList" class="user-list"></ul>
+        </div>
+
+        <div id="historySection" class="sidebar-section" style="display: none;">
+          <h4>📜 Historial de Visitas</h4>
+          <ul id="historyList" class="history-list"></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://vutnvigxtceitadorvob.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_zAPJfsSX5u-6eFqnvwrOfw_IAFUzxbo'; 
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let activeZoneId = null;
+  let currentZoneCreatorId = null;
+  let isDrawing = false;
+  let ctx, canvas;
+  let activeChannel = null;
+
+  // Estados de Herramientas
+  let currentTool = 'brush'; // brush, spray, shape, eraser
+  let useRuler = false;
+  let myStrokesIDs = []; // Para llevar control de los trazos propios y hacer Undo
+
+  function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+      || window.innerWidth <= 768;
+  }
+
+  async function init() {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (error || !session) {
+      alert("Debes iniciar sesión primero en la aplicación.");
+      window.location.href = 'index.html';
+      return;
     }
+    
+    currentUser = session.user;
+    setupCanvas();
+    loadZones();
+    
+    supabaseClient
+      .channel('public_zones')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'graffiti_zones' }, () => {
+        loadZones();
+      })
+      .subscribe();
 
-    // Read query param user
-    function getQueryUserId() {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('user'); // if present show that profile
-      } catch(e){ return null; }
+    if (isMobileDevice()) {
+      document.getElementById('createZoneBtn').disabled = true;
+      document.getElementById('zoneNameInput').disabled = true;
     }
+  }
 
-    // Load profile (works for own or other user)
-    async function loadProfile(userId = null) {
-      // Determine target user id
-      const sessionUser = await getSessionUser();
-      currentUserId = sessionUser ? sessionUser.id : null;
-      const targetId = userId || getQueryUserId() || currentUserId;
-
-      viewingUserId = targetId;
-
-      // UI defaults
-      document.getElementById('profileNameTitle').innerText = 'Cargando...';
-      document.getElementById('profileEmailSubtitle').innerText = '';
-      document.getElementById('displayName').innerText = '-';
-      document.getElementById('displayAge').innerText = '-';
-      document.getElementById('displayTaste').innerText = '-';
-      document.getElementById('displayId').innerText = '-';
-      document.getElementById('followersCount').innerText = '0';
-      document.getElementById('starsCount').innerText = '0';
-      otherProfileActions.classList.add('hidden');
-
-      if (!targetId) {
-        // No session and no user specified
-        document.getElementById('profileNameTitle').innerText = 'Invitado';
-        return;
-      }
-
-      // First try to get from profiles table
-      try {
-        const { data } = await supabaseClient
-          .from('profiles')
-          .select('id, display_name, followers_count, stars')
-          .eq('id', targetId)
-          .limit(1)
-          .single();
-
-        if (data) {
-          const display = data.display_name || (data.id ? data.id.substring(0,8) : 'Usuario');
-          document.getElementById('profileNameTitle').innerText = display;
-          document.getElementById('displayName').innerText = display;
-          document.getElementById('displayId').innerText = data.id || '-';
-          document.getElementById('followersCount').innerText = Number(data.followers_count || 0);
-          document.getElementById('starsCount').innerText = Number(data.stars || 0);
-
-          // If viewing other user's profile and logged in, show follow/unfollow actions
-          if (currentUserId && currentUserId !== targetId) {
-            otherProfileActions.classList.remove('hidden');
-            await updateFollowButtons(currentUserId, targetId);
-          }
-
-        } else {
-          // fallback to auth.users -> user_metadata (if profiles row not present)
-          await loadProfileFromAuthMeta(targetId);
-        }
-      } catch (err) {
-        // If error (table doesn't exist or permission), fallback to user metadata
-        console.warn('profiles fetch error, fallback to auth metadata', err);
-        await loadProfileFromAuthMeta(targetId);
-      }
-
-      // If target is current user, also fill edit form and avatar using auth metadata
-      if (currentUserId && targetId === currentUserId) {
-        // get metadata from auth (for avatar, name fields)
-        try {
-          const s = await supabaseClient.auth.getSession();
-          const sessionData = s && s.data ? s.data : s;
-          if (sessionData && sessionData.session && sessionData.session.user) {
-            const u = sessionData.session.user;
-            const meta = u.user_metadata || {};
-            // fill fields if shown
-            document.getElementById('profileEmailSubtitle').innerText = u.email || '';
-            document.getElementById('displayAge').innerText = meta.edad || '-';
-            document.getElementById('displayTaste').innerText = (meta.gustos || '-').toString().toUpperCase();
-            document.getElementById('editNombre').value = meta.nombre || '';
-            document.getElementById('editApellido').value = meta.apellido || '';
-            document.getElementById('editEdad').value = meta.edad || '';
-            document.getElementById('editGustos').value = meta.gustos || '';
-            // avatar
-            if (meta.foto_perfil) {
-              const avatarImg = document.getElementById('profileAvatarImg');
-              const initial = document.getElementById('profileInitial');
-              avatarImg.src = meta.foto_perfil;
-              avatarImg.classList.remove('hidden');
-              initial.classList.add('hidden');
-            }
-          }
-        } catch(e){ console.warn(e); }
-      }
-    }
-
-    // fallback: load from auth.user metadata
-    async function loadProfileFromAuthMeta(userId) {
-      try {
-        const { data: usersData, error } = await supabaseClient.auth.admin.getUserById
-          ? await supabaseClient.auth.admin.getUserById(userId) // not always available on client
-          : { data: null, error: 'admin.getUserById not available in client' };
-
-        // admin API not available on client; instead, try reading profiles via SELECT public.profiles if accessible was done earlier.
-        // As fallback show id
-        document.getElementById('profileNameTitle').innerText = userId.substring(0,8);
-        document.getElementById('displayName').innerText = userId.substring(0,8);
-        document.getElementById('displayId').innerText = userId;
-        document.getElementById('followersCount').innerText = '0';
-        document.getElementById('starsCount').innerText = '0';
-      } catch(e) {
-        console.warn('fallback auth meta failed', e);
-        document.getElementById('profileNameTitle').innerText = userId.substring(0,8);
-        document.getElementById('displayName').innerText = userId.substring(0,8);
-        document.getElementById('displayId').innerText = userId;
-      }
-    }
-
-    // Update follow/unfollow buttons
-    async function updateFollowButtons(meId, targetId) {
-      try {
-        const { data, error } = await supabaseClient
-          .from('follows')
-          .select('*')
-          .match({ follower_id: meId, followee_id: targetId })
-          .limit(1);
-
-        if (error) {
-          console.warn('check follow error', error);
-          // fallback: hide unfollow
-          btnFollow.classList.remove('hidden');
-          btnUnfollow.classList.add('hidden');
-          return;
-        }
-
-        if (data && data.length > 0) {
-          // already following
-          btnFollow.classList.add('hidden');
-          btnUnfollow.classList.remove('hidden');
-        } else {
-          btnFollow.classList.remove('hidden');
-          btnUnfollow.classList.add('hidden');
-        }
-      } catch(e) { console.warn(e); }
-    }
-
-    // follow user
-    async function followUser(targetId) {
-      try {
-        const sessionUser = await getSessionUser();
-        if (!sessionUser) { alert('Inicia sesión para seguir a otros.'); return; }
-        const me = sessionUser.id;
-        const { data, error } = await supabaseClient
-          .from('follows')
-          .insert([{ follower_id: me, followee_id: targetId }]);
-
-        if (error) throw error;
-        toast('Seguido correctamente.');
-        // refresh counts from profiles table
-        await refreshCounts(targetId);
-        await updateFollowButtons(me, targetId);
-      } catch (err) {
-        console.error('followUser error', err);
-        alert('No se pudo seguir: ' + (err.message || err));
-      }
-    }
-
-    // unfollow user
-    async function unfollowUser(targetId) {
-      try {
-        const sessionUser = await getSessionUser();
-        if (!sessionUser) { alert('Inicia sesión para dejar de seguir.'); return; }
-        const me = sessionUser.id;
-        const { data, error } = await supabaseClient
-          .from('follows')
-          .delete()
-          .match({ follower_id: me, followee_id: targetId });
-
-        if (error) throw error;
-        toast('Dejado de seguir.');
-        await refreshCounts(targetId);
-        await updateFollowButtons(me, targetId);
-      } catch (err) {
-        console.error('unfollowUser error', err);
-        alert('No se pudo dejar de seguir: ' + (err.message || err));
-      }
-    }
-
-    // refresh followers_count & stars for a target user (reads profiles table)
-    async function refreshCounts(targetId) {
-      try {
-        const { data, error } = await supabaseClient.from('profiles').select('followers_count,stars').eq('id', targetId).limit(1).single();
-        if (error) throw error;
-        document.getElementById('followersCount').innerText = Number(data.followers_count || 0);
-        document.getElementById('starsCount').innerText = Number(data.stars || 0);
-      } catch (err) {
-        console.warn('refreshCounts fallback to metadata', err);
-        // fallback: try metadata of target (not trivial from client), so leave as-is
-      }
-    }
-
-    // add star to target
-    async function addStarToUser(targetId) {
-      try {
-        const sessionUser = await getSessionUser();
-        if (!sessionUser) { alert('Inicia sesión para añadir estrellas.'); return; }
-        // upsert into profiles: increment stars
-        const { data: existing, error: selErr } = await supabaseClient.from('profiles').select('stars').eq('id', targetId).limit(1).single();
-        if (!selErr && existing) {
-          const newStars = (existing.stars || 0) + 1;
-          const { error: upErr } = await supabaseClient.from('profiles').upsert({ id: targetId, stars: newStars }, { onConflict: 'id' });
-          if (upErr) throw upErr;
-          document.getElementById('starsCount').innerText = newStars;
-          toast('Estrella añadida.');
-          return;
-        }
-        // fallback: try metadata update if target is self
-        if (sessionUser.id === targetId) {
-          const local = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || '{}');
-          const newStars = (Number(local.stars || 0) + 1);
-          await supabaseClient.auth.updateUser({ data: { stars: newStars } });
-          local.stars = newStars;
-          localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
-          document.getElementById('starsCount').innerText = newStars;
-          toast('Estrella añadida (metadata).');
-        } else {
-          alert('No se pudo añadir estrella (falta tabla profiles).');
-        }
-      } catch(e) {
-        console.error('addStar error', e);
-        alert('Error al añadir estrella: ' + (e.message || e));
-      }
-    }
-
-    // Save profile (name, apellido, edad, gustos) + optional avatar upload
-    saveProfileBtn?.addEventListener('click', async () => {
-      saveProfileBtn.disabled = true;
-      saveProfileBtn.innerText = 'GUARDANDO...';
-      try {
-        const nombre = document.getElementById('editNombre').value.trim();
-        const apellido = document.getElementById('editApellido').value.trim();
-        const edad = document.getElementById('editEdad').value || null;
-        const gustos = document.getElementById('editGustos').value.trim() || 'movie';
-
-        // upload avatar if selected
-        let foto_perfil_url = null;
-        const file = avatarFileInput.files && avatarFileInput.files[0];
-        const sessionUser = await getSessionUser();
-        const userId = sessionUser ? sessionUser.id : null;
-
-        if (file && userId) {
-          const path = `avatars/${userId}/${Date.now()}_${file.name}`;
-          try {
-            const up = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
-            if (up.error) {
-              console.warn('storage upload error', up.error);
-              foto_perfil_url = await fileToDataURL(file);
-            } else {
-              const { data: pd } = supabaseClient.storage.from('avatars').getPublicUrl(path);
-              foto_perfil_url = pd && pd.publicUrl ? pd.publicUrl : null;
-            }
-          } catch(e) {
-            console.warn('upload exception', e);
-            foto_perfil_url = await fileToDataURL(file);
-          }
-        }
-
-        // Update user metadata
-        const meta = { nombre, apellido, edad: edad ? Number(edad) : null, gustos };
-        if (foto_perfil_url) meta.foto_perfil = foto_perfil_url;
-
-        try {
-          const { data, error } = await supabaseClient.auth.updateUser({ data: meta });
-          if (error) throw error;
-          // Also upsert into profiles table display_name for quick public reading
-          try {
-            const display_name = (nombre || '') + (apellido ? ' ' + apellido : '');
-            await supabaseClient.from('profiles').upsert({ id: userId, display_name }, { onConflict: 'id' });
-          } catch(e) { console.warn('profiles upsert failed', e); }
-          toast('Perfil actualizado.');
-          await loadProfile(userId);
-          editForm.classList.add('hidden');
-        } catch(e) {
-          console.warn('updateUser metadata failed', e);
-          document.getElementById('editMsg').innerText = 'No se pudo guardar en Supabase. Guardado localmente.';
-          // fallback localStorage
-          const local = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || '{}');
-          local.nombre = nombre; local.apellido = apellido; local.edad = edad; local.gustos = gustos;
-          if (foto_perfil_url) local.foto_perfil = foto_perfil_url;
-          localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
-          await loadProfile(userId);
-        }
-      } catch(e) {
-        console.error(e);
-        document.getElementById('editMsg').innerText = 'Error guardando perfil.';
-      } finally {
-        saveProfileBtn.disabled = false;
-        saveProfileBtn.innerText = 'Guardar';
+  function setTool(tool) {
+    currentTool = tool;
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      if(['brushMode','sprayMode','shapeMode','eraserMode'].includes(btn.id)) {
+        btn.classList.remove('active');
       }
     });
+    if(tool === 'brush') document.getElementById('brushMode').classList.add('active');
+    if(tool === 'spray') document.getElementById('sprayMode').classList.add('active');
+    if(tool === 'shape') document.getElementById('shapeMode').classList.add('active');
+    if(tool === 'eraser') document.getElementById('eraserMode').classList.add('active');
+  }
 
-    // Upload avatar quick button
-    uploadAvatarBtn?.addEventListener('click', async () => {
-      const file = avatarFileInput.files && avatarFileInput.files[0];
-      if (!file) { alert('Selecciona una imagen primero.'); return; }
-      uploadAvatarBtn.disabled = true;
-      uploadAvatarBtn.innerText = 'SUBIENDO...';
+  function toggleRuler() {
+    useRuler = !useRuler;
+    const btn = document.getElementById('ruleToggleBtn');
+    if(useRuler) {
+      btn.classList.add('active');
+      btn.textContent = '📏 Regla: ON';
+    } else {
+      btn.classList.remove('active');
+      btn.textContent = '📏 Regla: OFF';
+    }
+  }
+
+  async function loadZones() {
+    const { data: zones, error } = await supabaseClient.from('graffiti_zones').select('*');
+    if (error) return;
+
+    const grid = document.getElementById('zonesGrid');
+    grid.innerHTML = '';
+
+    if (!zones || zones.length === 0) {
+      grid.innerHTML = '<p>No hay zonas creadas aún. ¡Crea la primera!</p>';
+      return;
+    }
+
+    for (const zone of zones) {
+      const isOwner = zone.created_by === currentUser.id;
+      const tempChannel = supabaseClient.channel(`room_${zone.id}`);
       try {
-        const sessionUser = await getSessionUser();
-        const userId = sessionUser ? sessionUser.id : null;
-        let foto_perfil_url = null;
-        if (userId) {
-          const path = `avatars/${userId}/${Date.now()}_${file.name}`;
-          const up = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
-          if (up.error) {
-            console.warn('upload error', up.error);
-            foto_perfil_url = await fileToDataURL(file);
-          } else {
-            const { data: pd } = supabaseClient.storage.from('avatars').getPublicUrl(path);
-            foto_perfil_url = pd && pd.publicUrl ? pd.publicUrl : null;
-          }
-        } else {
-          foto_perfil_url = await fileToDataURL(file);
-        }
-        // update metadata
-        try {
-          await supabaseClient.auth.updateUser({ data: { foto_perfil: foto_perfil_url } });
-          await loadProfile(userId || null);
-          toast('Avatar actualizado.');
-        } catch (err) {
-          console.warn('update metadata failed', err);
-          const local = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || '{}');
-          local.foto_perfil = foto_perfil_url;
-          localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(local));
-          await loadProfile(userId || null);
-        }
-      } catch(e) {
-        console.error(e);
-        alert('Error subiendo avatar.');
-      } finally {
-        uploadAvatarBtn.disabled = false;
-        uploadAvatarBtn.innerText = 'Subir';
+        await tempChannel.subscribe();
+        const presenceState = tempChannel.presenceState ? tempChannel.presenceState() : {};
+        const activeCount = Object.keys(presenceState).length || 0;
+        await supabaseClient.removeChannel(tempChannel);
+        
+        const isFull = activeCount >= 10;
+        const card = document.createElement('div');
+        card.className = 'zone-card';
+        card.innerHTML = `
+          <h3>${zone.name}</h3>
+          <div class="badge">${activeCount} / 10 Personas</div>
+          <button onclick="enterZone('${zone.id}', '${zone.name}', '${zone.created_by}')" ${isFull ? 'disabled' : ''}>
+            ${isFull ? 'Zona Llena' : 'Entrar a Dibujar'}
+          </button>
+          ${isOwner ? `<button class="delete" onclick="deleteZone('${zone.id}')">Borrar Mi Zona</button>` : ''}
+        `;
+        grid.appendChild(card);
+      } catch (err) {
+        console.warn(err);
       }
+    }
+  }
+
+  document.getElementById('createZoneBtn').addEventListener('click', async () => {
+    if (isMobileDevice()) {
+      alert("La creación de zonas solo está disponible desde una computadora.");
+      return;
+    }
+    const name = document.getElementById('zoneNameInput').value.trim();
+    if (!name) return alert("Escribe un nombre para la zona");
+
+    const { data: userZones } = await supabaseClient.from('graffiti_zones').select('id').eq('created_by', currentUser.id);
+    if (userZones && userZones.length > 0) {
+      alert("Ya tienes una zona creada. Debes borrar la tuya si quieres crear una nueva.");
+      return;
+    }
+
+    const { data, error } = await supabaseClient.from('graffiti_zones').insert([{ name: name, created_by: currentUser.id }]).select().single();
+    if (!error) {
+      document.getElementById('zoneNameInput').value = '';
+      enterZone(data.id, data.name, data.created_by);
+    }
+  });
+
+  async function deleteZone(zoneId) {
+    if (!confirm("¿Seguro que quieres borrar tu zona y todos sus trazos?")) return;
+    await supabaseClient.from('graffiti_strokes').delete().eq('zone_id', zoneId);
+    await supabaseClient.from('graffiti_zone_access_logs').delete().eq('zone_id', zoneId);
+    await supabaseClient.from('graffiti_zones').delete().eq('id', zoneId);
+    loadZones();
+  }
+
+  async function enterZone(zoneId, zoneName, creatorId) {
+    activeZoneId = zoneId;
+    currentZoneCreatorId = creatorId;
+    myStrokesIDs = [];
+
+    document.getElementById('currentZoneTitle').textContent = `Zona: ${zoneName}`;
+    document.getElementById('canvasView').style.display = 'flex';
+    resizeCanvas();
+    loadStrokes();
+
+    await logUserAccess(zoneId);
+
+    const isOwner = currentZoneCreatorId === currentUser.id;
+    const historySection = document.getElementById('historySection');
+    if (isOwner) {
+      historySection.style.display = 'block';
+      loadAccessHistory(zoneId);
+    } else {
+      historySection.style.display = 'none';
+    }
+
+    activeChannel = supabaseClient.channel(`room_${zoneId}`, {
+      config: { presence: { key: currentUser.id } }
     });
 
-    // Change password
-    document.getElementById('changePasswordBtn')?.addEventListener('click', async () => {
-      const newPass = document.getElementById('newPassword').value;
-      if (!newPass || newPass.length < 6) {
-        alert('Ingresa una contraseña de al menos 6 caracteres.');
-        return;
-      }
-      const btn = document.getElementById('changePasswordBtn');
-      btn.disabled = true; btn.innerText = 'CAMBIANDO...';
-      try {
-        const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
-        if (error) throw error;
-        alert('Contraseña cambiada correctamente.');
-        document.getElementById('newPassword').value = '';
-      } catch(err) {
-        console.error(err);
-        alert('Error al cambiar contraseña: ' + (err?.message || err));
-      } finally {
-        btn.disabled = false; btn.innerText = 'Cambiar';
-      }
+    activeChannel.on('presence', { event: 'sync' }, () => {
+      updateConnectedUsersList(activeChannel.presenceState());
     });
 
-    // helper file -> dataurl
-    function fileToDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error('Error leyendo archivo'));
-        reader.readAsDataURL(file);
+    activeChannel.on('broadcast', { event: 'stroke' }, payload => {
+      renderStrokeObject(payload.payload.stroke_data);
+    });
+
+    activeChannel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        const userEmail = currentUser.email ? currentUser.email.split('@')[0] : 'Usuario';
+        await activeChannel.track({ user_id: currentUser.id, email: userEmail, online_at: new Date() });
+      }
+    });
+  }
+
+  function updateConnectedUsersList(state) {
+    const list = document.getElementById('connectedUsersList');
+    list.innerHTML = '';
+    const keys = Object.keys(state);
+    document.getElementById('connectedCount').textContent = keys.length;
+    keys.forEach(key => {
+      const presenceInfo = state[key][0];
+      const li = document.createElement('li');
+      li.className = 'user-item';
+      li.innerHTML = `<span class="status-dot"></span> ${presenceInfo.email || 'Anónimo'}`;
+      list.appendChild(li);
+    });
+  }
+
+  async function logUserAccess(zoneId) {
+    const userEmail = currentUser.email ? currentUser.email.split('@')[0] : 'Anónimo';
+    await supabaseClient.from('graffiti_zone_access_logs').insert([{
+      zone_id: zoneId,
+      user_id: currentUser.id,
+      user_email: userEmail
+    }]);
+  }
+
+  async function loadAccessHistory(zoneId) {
+    const { data: logs } = await supabaseClient.from('graffiti_zone_access_logs').select('*').eq('zone_id', zoneId).order('accessed_at', { ascending: false }).limit(10);
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '';
+    if (!logs || logs.length === 0) {
+      historyList.innerHTML = '<li style="color:#71717a">Sin visitas</li>';
+      return;
+    }
+    logs.forEach(log => {
+      const date = new Date(log.accessed_at);
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const li = document.createElement('li');
+      li.className = 'history-item';
+      li.innerHTML = `<span>👤 ${log.user_email}</span> <span>${timeStr}</span>`;
+      historyList.appendChild(li);
+    });
+  }
+
+  document.getElementById('exitZoneBtn').addEventListener('click', async () => {
+    if (activeChannel) {
+      await activeChannel.untrack();
+      await supabaseClient.removeChannel(activeChannel);
+      activeChannel = null;
+    }
+    document.getElementById('canvasView').style.display = 'none';
+    activeZoneId = null;
+    loadZones();
+  });
+
+  function setupCanvas() {
+    canvas = document.getElementById('graffitiCanvas');
+    ctx = canvas.getContext('2d');
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { startDrawing(e.touches[0]); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  function resizeCanvas() {
+    if (canvas && canvas.parentElement) {
+      canvas.width = canvas.parentElement.clientWidth - 260;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+  }
+
+  let currentStrokePoints = [];
+  let lastX = 0, lastY = 0;
+
+  function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+    currentStrokePoints = [{ x: lastX, y: lastY }];
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // Aplicar Regla (Guía de Línea Recta respecto al punto inicial)
+    if (useRuler && currentStrokePoints.length > 0) {
+      let startPoint = currentStrokePoints[0];
+      // Forzar movimiento puramente horizontal o vertical según cercanía
+      if (Math.abs(x - startPoint.x) > Math.abs(y - startPoint.y)) {
+        y = startPoint.y;
+      } else {
+        x = startPoint.x;
+      }
+    }
+
+    currentStrokePoints.push({ x, y });
+
+    const color = document.getElementById('brushColor').value;
+    const size = parseInt(document.getElementById('brushSize').value);
+    const opacity = parseFloat(document.getElementById('brushOpacity').value);
+
+    let strokeData = {
+      tool: currentTool,
+      color: color,
+      size: size,
+      opacity: opacity,
+      points: currentStrokePoints
+    };
+
+    renderStrokeObject(strokeData);
+    lastX = x;
+    lastY = y;
+  }
+
+  async function stopDrawing() {
+    if (!isDrawing) return;
+    isDrawing = false;
+
+    if (currentStrokePoints.length > 0 && activeZoneId) {
+      const color = document.getElementById('brushColor').value;
+      const size = parseInt(document.getElementById('brushSize').value);
+      const opacity = parseFloat(document.getElementById('brushOpacity').value);
+
+      const finalStroke = {
+        tool: currentTool,
+        color: color,
+        size: size,
+        opacity: opacity,
+        points: currentStrokePoints
+      };
+
+      if (activeChannel) {
+        activeChannel.send({
+          type: 'broadcast',
+          event: 'stroke',
+          payload: { stroke_data: finalStroke }
+        });
+      }
+
+      const { data } = await supabaseClient.from('graffiti_strokes').insert([{
+        zone_id: activeZoneId,
+        user_id: currentUser.id,
+        stroke_data: finalStroke
+      }]).select().single();
+
+      if (data) {
+        myStrokesIDs.push(data.id);
+      }
+    }
+    currentStrokePoints = [];
+  }
+
+  function renderStrokeObject(s) {
+    if (!s || !s.points || s.points.length === 0) return;
+    ctx.save();
+    ctx.globalAlpha = s.opacity || 1.0;
+
+    if (s.tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.lineWidth = s.size * 1.5;
+      ctx.lineCap = 'round';
+      ctx.moveTo(s.points[0].x, s.points[0].y);
+      for (let i = 1; i < s.points.length; i++) {
+        ctx.lineTo(s.points[i].x, s.points[i].y);
+      }
+      ctx.stroke();
+    } else if (s.tool === 'spray') {
+      ctx.fillStyle = s.color;
+      const density = s.size * 2;
+      s.points.forEach(pt => {
+        for (let i = 0; i < density; i++) {
+          let offsetX = (Math.random() - 0.5) * s.size * 2;
+          let offsetY = (Math.random() - 0.5) * s.size * 2;
+          ctx.fillRect(pt.x + offsetX, pt.y + offsetY, 1.5, 1.5);
+        }
+      });
+    } else if (s.tool === 'shape') {
+      ctx.fillStyle = s.color;
+      s.points.forEach(pt => {
+        ctx.fillRect(pt.x - s.size/2, pt.y - s.size/2, s.size, s.size);
+      });
+    } else {
+      // Pincel Normal
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = s.size;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(s.points[0].x, s.points[0].y);
+      for (let i = 1; i < s.points.length; i++) {
+        ctx.lineTo(s.points[i].x, s.points[i].y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  async function loadStrokes() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const { data: strokes } = await supabaseClient.from('graffiti_strokes').select('*').eq('zone_id', activeZoneId);
+    if (strokes) {
+      strokes.forEach(s => {
+        renderStrokeObject(s.stroke_data);
+        if (s.user_id === currentUser.id) {
+          myStrokesIDs.push(s.id);
+        }
       });
     }
+  }
 
-    // follow/unfollow button handlers
-    btnFollow?.addEventListener('click', async () => {
-      if (!viewingUserId) return;
-      await followUser(viewingUserId);
-    });
-    btnUnfollow?.addEventListener('click', async () => {
-      if (!viewingUserId) return;
-      await unfollowUser(viewingUserId);
-    });
-    btnAddStar?.addEventListener('click', async () => {
-      if (!viewingUserId) return;
-      await addStarToUser(viewingUserId);
-    });
-
-    // edit form toggles
-    editProfileBtn?.addEventListener('click', () => {
-      editForm.classList.toggle('hidden');
-      if (!editForm.classList.contains('hidden')) editForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
-    cancelEditBtn?.addEventListener('click', () => editForm.classList.add('hidden'));
-
-    // logout
-    async function logoutSession() {
-      try { await supabaseClient.auth.signOut(); } catch(e){}
-      localStorage.removeItem(LOCAL_SESSION_KEY);
-      if (location.protocol === 'file:') {
-        // if opened as file, just clear UI
-        location.reload();
-        return;
-      }
-      window.location.href = 'index.html';
+  async function undoLastStroke() {
+    if (myStrokesIDs.length === 0) {
+      alert("No tienes trazos recientes para deshacer.");
+      return;
     }
+    const lastId = myStrokesIDs.pop();
+    await supabaseClient.from('graffiti_strokes').delete().eq('id', lastId);
+    loadStrokes(); // Recarga el canvas completo limpio con los trazos restantes de todos
+  }
 
-    // On load
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (window.lucide) lucide.createIcons();
-      await loadProfile();
-    });
-
-    // Auth state change -> update local and reload profile
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      if (session && session.user) {
-        const u = session.user;
-        const meta = u.user_metadata || {};
-        const profile = { id: u.id, email: u.email, nombre: meta.nombre || '', apellido: meta.apellido || '', edad: meta.edad || '', gustos: meta.gustos || '', foto_perfil: meta.foto_perfil || '', followers_count: meta.followers_count || 0, stars: meta.stars || 0 };
-        localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(profile));
-        loadProfile();
-      } else {
-        // logged out
-        localStorage.removeItem(LOCAL_SESSION_KEY);
-        loadProfile();
-      }
-    });
-
-  </script>
+  window.onload = init;
+</script>
 </body>
 </html>
