@@ -25,8 +25,22 @@
 
     /* Modal / Canvas de Dibujo */
     #canvasView { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; flex-direction: column; }
-    .canvas-tools { background: #18181b; padding: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-    canvas { flex: 1; background: #111; cursor: crosshair; touch-action: none; }
+    .canvas-tools { background: #18181b; padding: 10px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .tool-group { display: flex; gap: 8px; align-items: center; background: #27272a; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; }
+    .tool-btn { background: #3f3f46; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; margin: 0; }
+    .tool-btn.active { background: #3b82f6; }
+
+    .workspace { display: flex; flex-direction: row; width: 100%; height: calc(100vh - 65px); overflow: hidden; position: relative; }
+    canvas { flex: 1; width: 100%; background: #111; cursor: crosshair; touch-action: none; }
+
+    /* Panel Lateral Derecho para Usuarios e Historial */
+    .sidebar { width: 260px; min-width: 260px; background: #18181b; border-left: 1px solid #27272a; display: flex; flex-direction: column; padding: 15px; gap: 15px; overflow-y: auto; font-size: 0.85rem; z-index: 10; }
+    .sidebar-section { background: #27272a; border-radius: 6px; padding: 10px; }
+    .sidebar-section h4 { margin-bottom: 8px; font-size: 0.9rem; color: #60a5fa; border-bottom: 1px solid #3f3f46; padding-bottom: 4px; }
+    .user-list, .history-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .user-item { display: flex; align-items: center; gap: 6px; color: #e4e4e7; word-break: break-all; }
+    .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .history-item { color: #a1a1aa; font-size: 0.78rem; display: flex; justify-content: space-between; }
   </style>
 </head>
 <body>
@@ -50,16 +64,48 @@
   <div id="canvasView">
     <div class="canvas-tools">
       <div style="display: flex; gap: 10px; align-items: center;">
-        <button id="exitZoneBtn" class="leave" style="width: auto;">Salir de la Zona</button>
-        <span id="currentZoneTitle">Zona</span>
-        <span id="onlineCounter" style="font-size: 0.85rem; color: #10b981; margin-left: 10px;">🟢 Conectados: 1</span>
+        <button id="exitZoneBtn" class="leave" style="width: auto;">Salir</button>
+        <span id="currentZoneTitle" style="font-weight: bold; color: #60a5fa;">Zona</span>
       </div>
-      <div style="display: flex; gap: 10px; align-items: center;">
-        <label>Color: <input type="color" id="brushColor" value="#ff0055"></label>
-        <label>Grosor: <input type="range" id="brushSize" min="2" max="30" value="5"></label>
+
+      <!-- Barra de Herramientas Avanzadas -->
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <div class="tool-group">
+          <button id="brushMode" class="tool-btn active" onclick="setTool('brush')">Pincel</button>
+          <button id="sprayMode" class="tool-btn" onclick="setTool('spray')">Spray</button>
+          <button id="shapeMode" class="tool-btn" onclick="setTool('shape')">Cuadrado</button>
+          <button id="eraserMode" class="tool-btn" onclick="setTool('eraser')">Borrador</button>
+        </div>
+
+        <div class="tool-group">
+          <button class="tool-btn" onclick="undoLastStroke()" title="Deshacer último trazo propio">↩ Deshacer</button>
+          <button id="ruleToggleBtn" class="tool-btn" onclick="toggleRuler()">📏 Regla: OFF</button>
+        </div>
+
+        <div class="tool-group">
+          <label>Color: <input type="color" id="brushColor" value="#ff0055"></label>
+          <label>Grosor: <input type="range" id="brushSize" min="2" max="60" value="8"></label>
+          <label>Opacidad: <input type="range" id="brushOpacity" min="0.1" max="1" step="0.1" value="1"></label>
+        </div>
       </div>
     </div>
-    <canvas id="graffitiCanvas"></canvas>
+
+    <div class="workspace">
+      <canvas id="graffitiCanvas"></canvas>
+      
+      <!-- Panel Lateral Derecho -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h4>🟢 Conectados (<span id="connectedCount">0</span>)</h4>
+          <ul id="connectedUsersList" class="user-list"></ul>
+        </div>
+
+        <div id="historySection" class="sidebar-section" style="display: none;">
+          <h4>📜 Historial de Visitas</h4>
+          <ul id="historyList" class="history-list"></ul>
+        </div>
+      </aside>
+    </div>
   </div>
 
 <script>
@@ -69,11 +115,16 @@
 
   let currentUser = null;
   let activeZoneId = null;
+  let currentZoneCreatorId = null;
   let isDrawing = false;
   let ctx, canvas;
   let activeChannel = null;
 
-  // Detectar si el usuario está desde un teléfono móvil
+  // Estados de Herramientas
+  let currentTool = 'brush'; // brush, spray, shape, eraser
+  let useRuler = false;
+  let myStrokesIDs = []; // Para llevar control de los trazos propios y hacer Undo
+
   function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
       || window.innerWidth <= 768;
@@ -92,7 +143,6 @@
     setupCanvas();
     loadZones();
     
-    // Escuchar cuando se crean o borran zonas en tiempo real
     supabaseClient
       .channel('public_zones')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'graffiti_zones' }, () => {
@@ -100,23 +150,40 @@
       })
       .subscribe();
 
-    // Si es dispositivo móvil, deshabilitar creación UI por UX (opcional)
     if (isMobileDevice()) {
       document.getElementById('createZoneBtn').disabled = true;
       document.getElementById('zoneNameInput').disabled = true;
     }
   }
 
-  // === REEMPLAZADA: nueva loadZones que consulta presencia por zona ===
-  async function loadZones() {
-    const { data: zones, error } = await supabaseClient
-      .from('graffiti_zones')
-      .select('*');
-      
-    if (error) {
-      console.error("Error al cargar zonas:", error.message);
-      return;
+  function setTool(tool) {
+    currentTool = tool;
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      if(['brushMode','sprayMode','shapeMode','eraserMode'].includes(btn.id)) {
+        btn.classList.remove('active');
+      }
+    });
+    if(tool === 'brush') document.getElementById('brushMode').classList.add('active');
+    if(tool === 'spray') document.getElementById('sprayMode').classList.add('active');
+    if(tool === 'shape') document.getElementById('shapeMode').classList.add('active');
+    if(tool === 'eraser') document.getElementById('eraserMode').classList.add('active');
+  }
+
+  function toggleRuler() {
+    useRuler = !useRuler;
+    const btn = document.getElementById('ruleToggleBtn');
+    if(useRuler) {
+      btn.classList.add('active');
+      btn.textContent = '📏 Regla: ON';
+    } else {
+      btn.classList.remove('active');
+      btn.textContent = '📏 Regla: OFF';
     }
+  }
+
+  async function loadZones() {
+    const { data: zones, error } = await supabaseClient.from('graffiti_zones').select('*');
+    if (error) return;
 
     const grid = document.getElementById('zonesGrid');
     grid.innerHTML = '';
@@ -126,151 +193,141 @@
       return;
     }
 
-    // Consultar presencia en tiempo real para contar personas activas en cada zona
     for (const zone of zones) {
       const isOwner = zone.created_by === currentUser.id;
-      
-      // Consultar cuántos usuarios hay conectados a esta zona
       const tempChannel = supabaseClient.channel(`room_${zone.id}`);
       try {
         await tempChannel.subscribe();
-        // Small delay could help to ensure presence is ready in some environments
-        // await new Promise(r => setTimeout(r, 100));
         const presenceState = tempChannel.presenceState ? tempChannel.presenceState() : {};
         const activeCount = Object.keys(presenceState).length || 0;
-        // Remove the temporary channel
         await supabaseClient.removeChannel(tempChannel);
         
         const isFull = activeCount >= 10;
-
         const card = document.createElement('div');
         card.className = 'zone-card';
         card.innerHTML = `
           <h3>${zone.name}</h3>
           <div class="badge">${activeCount} / 10 Personas</div>
-          <button 
-            onclick="enterZone('${zone.id}', '${zone.name}')" 
-            ${isFull ? 'disabled' : ''}>
+          <button onclick="enterZone('${zone.id}', '${zone.name}', '${zone.created_by}')" ${isFull ? 'disabled' : ''}>
             ${isFull ? 'Zona Llena' : 'Entrar a Dibujar'}
           </button>
           ${isOwner ? `<button class="delete" onclick="deleteZone('${zone.id}')">Borrar Mi Zona</button>` : ''}
         `;
         grid.appendChild(card);
       } catch (err) {
-        // Si falla la suscripción temporal, mostrar tarjeta con contador desconocido (0)
-        console.warn('No se pudo obtener presencia temporal para zona', zone.id, err);
-        const card = document.createElement('div');
-        card.className = 'zone-card';
-        card.innerHTML = `
-          <h3>${zone.name}</h3>
-          <div class="badge">0 / 10 Personas</div>
-          <button onclick="enterZone('${zone.id}', '${zone.name}')">Entrar a Dibujar</button>
-          ${isOwner ? `<button class="delete" onclick="deleteZone('${zone.id}')">Borrar Mi Zona</button>` : ''}
-        `;
-        grid.appendChild(card);
-        // intentar limpiar el canal si quedó creado
-        try { await supabaseClient.removeChannel(tempChannel); } catch(e){/* ignore */ }
+        console.warn(err);
       }
     }
   }
-  // === fin loadZones ===
 
   document.getElementById('createZoneBtn').addEventListener('click', async () => {
-    // Bloqueo en dispositivos móviles
     if (isMobileDevice()) {
       alert("La creación de zonas solo está disponible desde una computadora.");
       return;
     }
-
     const name = document.getElementById('zoneNameInput').value.trim();
     if (!name) return alert("Escribe un nombre para la zona");
 
-    // Validar si el usuario ya creó una zona
-    const { data: userZones, error: userZonesError } = await supabaseClient
-      .from('graffiti_zones')
-      .select('id')
-      .eq('created_by', currentUser.id);
-
-    if (userZonesError) {
-      console.error('Error comprobando zonas del usuario:', userZonesError);
-      alert('Error interno, inténtalo de nuevo.');
-      return;
-    }
-
+    const { data: userZones } = await supabaseClient.from('graffiti_zones').select('id').eq('created_by', currentUser.id);
     if (userZones && userZones.length > 0) {
       alert("Ya tienes una zona creada. Debes borrar la tuya si quieres crear una nueva.");
       return;
     }
 
-    // Validar límite total de 20 zonas
-    const { data: currentZones, error: zonesError } = await supabaseClient.from('graffiti_zones').select('id');
-    if (zonesError) {
-      console.error('Error comprobando zonas totales:', zonesError);
-      alert('Error interno, inténtalo de nuevo.');
-      return;
-    }
-    if (currentZones && currentZones.length >= 20) {
-      alert("Se ha alcanzado el límite máximo de 20 zonas activas.");
-      return;
-    }
-
-    const { data, error } = await supabaseClient
-      .from('graffiti_zones')
-      .insert([{ name: name, created_by: currentUser.id }])
-      .select()
-      .single();
-
-    if (error) {
-      alert("Error al crear zona: " + error.message);
-    } else {
+    const { data, error } = await supabaseClient.from('graffiti_zones').insert([{ name: name, created_by: currentUser.id }]).select().single();
+    if (!error) {
       document.getElementById('zoneNameInput').value = '';
-      enterZone(data.id, data.name);
+      enterZone(data.id, data.name, data.created_by);
     }
   });
 
   async function deleteZone(zoneId) {
     if (!confirm("¿Seguro que quieres borrar tu zona y todos sus trazos?")) return;
-
-    // Borrar trazos
     await supabaseClient.from('graffiti_strokes').delete().eq('zone_id', zoneId);
-    // Borrar zona
-    const { error } = await supabaseClient.from('graffiti_zones').delete().eq('id', zoneId);
-
-    if (error) {
-      alert("Error al borrar zona: " + error.message);
-    } else {
-      loadZones();
-    }
+    await supabaseClient.from('graffiti_zone_access_logs').delete().eq('zone_id', zoneId);
+    await supabaseClient.from('graffiti_zones').delete().eq('id', zoneId);
+    loadZones();
   }
 
-  function enterZone(zoneId, zoneName) {
+  async function enterZone(zoneId, zoneName, creatorId) {
     activeZoneId = zoneId;
+    currentZoneCreatorId = creatorId;
+    myStrokesIDs = [];
+
     document.getElementById('currentZoneTitle').textContent = `Zona: ${zoneName}`;
     document.getElementById('canvasView').style.display = 'flex';
     resizeCanvas();
     loadStrokes();
 
-    // CANAL EN TIEMPO REAL: Presencia y Trazos de Dibujo
+    await logUserAccess(zoneId);
+
+    const isOwner = currentZoneCreatorId === currentUser.id;
+    const historySection = document.getElementById('historySection');
+    if (isOwner) {
+      historySection.style.display = 'block';
+      loadAccessHistory(zoneId);
+    } else {
+      historySection.style.display = 'none';
+    }
+
     activeChannel = supabaseClient.channel(`room_${zoneId}`, {
       config: { presence: { key: currentUser.id } }
     });
 
-    // 1. Contar personas dentro en tiempo real (al entrar o salir)
     activeChannel.on('presence', { event: 'sync' }, () => {
-      const state = activeChannel.presenceState();
-      const count = Object.keys(state).length;
-      document.getElementById('onlineCounter').textContent = `🟢 Conectados: ${count}`;
+      updateConnectedUsersList(activeChannel.presenceState());
     });
 
-    // 2. Recibir dibujos en tiempo real de otros usuarios
     activeChannel.on('broadcast', { event: 'stroke' }, payload => {
-      renderStroke(payload.payload.stroke_data);
+      renderStrokeObject(payload.payload.stroke_data);
     });
 
     activeChannel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
-        await activeChannel.track({ user_id: currentUser.id, online_at: new Date() });
+        const userEmail = currentUser.email ? currentUser.email.split('@')[0] : 'Usuario';
+        await activeChannel.track({ user_id: currentUser.id, email: userEmail, online_at: new Date() });
       }
+    });
+  }
+
+  function updateConnectedUsersList(state) {
+    const list = document.getElementById('connectedUsersList');
+    list.innerHTML = '';
+    const keys = Object.keys(state);
+    document.getElementById('connectedCount').textContent = keys.length;
+    keys.forEach(key => {
+      const presenceInfo = state[key][0];
+      const li = document.createElement('li');
+      li.className = 'user-item';
+      li.innerHTML = `<span class="status-dot"></span> ${presenceInfo.email || 'Anónimo'}`;
+      list.appendChild(li);
+    });
+  }
+
+  async function logUserAccess(zoneId) {
+    const userEmail = currentUser.email ? currentUser.email.split('@')[0] : 'Anónimo';
+    await supabaseClient.from('graffiti_zone_access_logs').insert([{
+      zone_id: zoneId,
+      user_id: currentUser.id,
+      user_email: userEmail
+    }]);
+  }
+
+  async function loadAccessHistory(zoneId) {
+    const { data: logs } = await supabaseClient.from('graffiti_zone_access_logs').select('*').eq('zone_id', zoneId).order('accessed_at', { ascending: false }).limit(10);
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '';
+    if (!logs || logs.length === 0) {
+      historyList.innerHTML = '<li style="color:#71717a">Sin visitas</li>';
+      return;
+    }
+    logs.forEach(log => {
+      const date = new Date(log.accessed_at);
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const li = document.createElement('li');
+      li.className = 'history-item';
+      li.innerHTML = `<span>👤 ${log.user_email}</span> <span>${timeStr}</span>`;
+      historyList.appendChild(li);
     });
   }
 
@@ -285,7 +342,6 @@
     loadZones();
   });
 
-  // --- LÓGICA DE DIBUJO ---
   function setupCanvas() {
     canvas = document.getElementById('graffitiCanvas');
     ctx = canvas.getContext('2d');
@@ -294,79 +350,173 @@
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { startDrawing(e.touches[0]); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); });
+    canvas.addEventListener('touchend', stopDrawing);
+
     window.addEventListener('resize', resizeCanvas);
   }
 
   function resizeCanvas() {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight - 50;
+    if (canvas && canvas.parentElement) {
+      canvas.width = canvas.parentElement.clientWidth - 260;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
   }
 
-  let currentStroke = [];
+  let currentStrokePoints = [];
+  let lastX = 0, lastY = 0;
 
   function startDrawing(e) {
     isDrawing = true;
-    currentStroke = [];
-    addPoint(e);
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+    currentStrokePoints = [{ x: lastX, y: lastY }];
   }
 
   function draw(e) {
     if (!isDrawing) return;
-    addPoint(e);
-    renderStroke(currentStroke);
-  }
-
-  function addPoint(e) {
     const rect = canvas.getBoundingClientRect();
-    currentStroke.push({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-      color: document.getElementById('brushColor').value,
-      size: document.getElementById('brushSize').value
-    });
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // Aplicar Regla (Guía de Línea Recta respecto al punto inicial)
+    if (useRuler && currentStrokePoints.length > 0) {
+      let startPoint = currentStrokePoints[0];
+      // Forzar movimiento puramente horizontal o vertical según cercanía
+      if (Math.abs(x - startPoint.x) > Math.abs(y - startPoint.y)) {
+        y = startPoint.y;
+      } else {
+        x = startPoint.x;
+      }
+    }
+
+    currentStrokePoints.push({ x, y });
+
+    const color = document.getElementById('brushColor').value;
+    const size = parseInt(document.getElementById('brushSize').value);
+    const opacity = parseFloat(document.getElementById('brushOpacity').value);
+
+    let strokeData = {
+      tool: currentTool,
+      color: color,
+      size: size,
+      opacity: opacity,
+      points: currentStrokePoints
+    };
+
+    renderStrokeObject(strokeData);
+    lastX = x;
+    lastY = y;
   }
 
   async function stopDrawing() {
     if (!isDrawing) return;
     isDrawing = false;
-    if (currentStroke.length > 0 && activeZoneId) {
-      // Transmitir en tiempo real a los demás conectados
+
+    if (currentStrokePoints.length > 0 && activeZoneId) {
+      const color = document.getElementById('brushColor').value;
+      const size = parseInt(document.getElementById('brushSize').value);
+      const opacity = parseFloat(document.getElementById('brushOpacity').value);
+
+      const finalStroke = {
+        tool: currentTool,
+        color: color,
+        size: size,
+        opacity: opacity,
+        points: currentStrokePoints
+      };
+
       if (activeChannel) {
         activeChannel.send({
           type: 'broadcast',
           event: 'stroke',
-          payload: { stroke_data: currentStroke }
+          payload: { stroke_data: finalStroke }
         });
       }
 
-      // Guardar en la base de datos para la memoria permanente
-      await supabaseClient.from('graffiti_strokes').insert([{
+      const { data } = await supabaseClient.from('graffiti_strokes').insert([{
         zone_id: activeZoneId,
         user_id: currentUser.id,
-        stroke_data: currentStroke
-      }]);
+        stroke_data: finalStroke
+      }]).select().single();
+
+      if (data) {
+        myStrokesIDs.push(data.id);
+      }
     }
+    currentStrokePoints = [];
   }
 
-  function renderStroke(points) {
-    if (!points || points.length < 2) return;
-    ctx.beginPath();
-    ctx.strokeStyle = points[0].color;
-    ctx.lineWidth = points[0].size;
-    ctx.lineCap = 'round';
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i].x, points[i].y);
+  function renderStrokeObject(s) {
+    if (!s || !s.points || s.points.length === 0) return;
+    ctx.save();
+    ctx.globalAlpha = s.opacity || 1.0;
+
+    if (s.tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.lineWidth = s.size * 1.5;
+      ctx.lineCap = 'round';
+      ctx.moveTo(s.points[0].x, s.points[0].y);
+      for (let i = 1; i < s.points.length; i++) {
+        ctx.lineTo(s.points[i].x, s.points[i].y);
+      }
+      ctx.stroke();
+    } else if (s.tool === 'spray') {
+      ctx.fillStyle = s.color;
+      const density = s.size * 2;
+      s.points.forEach(pt => {
+        for (let i = 0; i < density; i++) {
+          let offsetX = (Math.random() - 0.5) * s.size * 2;
+          let offsetY = (Math.random() - 0.5) * s.size * 2;
+          ctx.fillRect(pt.x + offsetX, pt.y + offsetY, 1.5, 1.5);
+        }
+      });
+    } else if (s.tool === 'shape') {
+      ctx.fillStyle = s.color;
+      s.points.forEach(pt => {
+        ctx.fillRect(pt.x - s.size/2, pt.y - s.size/2, s.size, s.size);
+      });
+    } else {
+      // Pincel Normal
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = s.size;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(s.points[0].x, s.points[0].y);
+      for (let i = 1; i < s.points.length; i++) {
+        ctx.lineTo(s.points[i].x, s.points[i].y);
+      }
+      ctx.stroke();
     }
-    ctx.stroke();
+    ctx.restore();
   }
 
   async function loadStrokes() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const { data: strokes } = await supabaseClient.from('graffiti_strokes').select('stroke_data').eq('zone_id', activeZoneId);
+    const { data: strokes } = await supabaseClient.from('graffiti_strokes').select('*').eq('zone_id', activeZoneId);
     if (strokes) {
-      strokes.forEach(s => renderStroke(s.stroke_data));
+      strokes.forEach(s => {
+        renderStrokeObject(s.stroke_data);
+        if (s.user_id === currentUser.id) {
+          myStrokesIDs.push(s.id);
+        }
+      });
     }
+  }
+
+  async function undoLastStroke() {
+    if (myStrokesIDs.length === 0) {
+      alert("No tienes trazos recientes para deshacer.");
+      return;
+    }
+    const lastId = myStrokesIDs.pop();
+    await supabaseClient.from('graffiti_strokes').delete().eq('id', lastId);
+    loadStrokes(); // Recarga el canvas completo limpio con los trazos restantes de todos
   }
 
   window.onload = init;
